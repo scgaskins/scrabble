@@ -20,11 +20,11 @@ void main() {
     Tile t = new Tile(" ");
     t.setBlankTile("a");
     expect(t.letter, "A");
-    t.resetTile();
+    t.resetBlankTile();
     expect(t.letter, " ");
     t.setBlankTile("A");
-    t.lockInLetter();
-    t.resetTile();
+    t.placeTile();
+    t.resetBlankTile();
     expect(t.letter, "A");
   });
   test("Converting tile to JSON and back", () {
