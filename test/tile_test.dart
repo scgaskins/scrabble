@@ -32,7 +32,7 @@ void main() {
     Tile originalTile = new Tile("A");
     String jsonString = encoder.encode(originalTile);
     print(jsonString);
-    Map tileMap = encoder.decode(jsonString);
+    Map<String, dynamic> tileMap = encoder.decode(jsonString);
     Tile decodedTile = Tile.fromJson(tileMap);
     expect(decodedTile.letter, originalTile.letter);
     expect(decodedTile.score, originalTile.score);
