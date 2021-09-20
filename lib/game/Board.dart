@@ -1,3 +1,4 @@
+import 'package:scrabble/game/Direction.dart';
 import 'package:scrabble/game/Position.dart';
 import 'package:scrabble/game/Tile.dart';
 
@@ -11,7 +12,7 @@ class Board {
   }
 
   Tile? getTileAtPosition(Position p) {
-    if (p.column >= 0 && p.column < boardSize && p.row >= 0 && p.row < boardSize) {
+    if (positionOnBoard(p)) {
       return _board[p.column][p.row];
     }
     return null;
@@ -20,6 +21,10 @@ class Board {
   bool positionOccupied(Position p) {
     Tile? tileAtPos = getTileAtPosition(p);
     return tileAtPos != null;
+  }
+
+  bool positionOnBoard(Position p) {
+    return p.column >= 0 && p.column < boardSize && p.row >= 0 && p.row < boardSize;
   }
 
   void addTileToPosition(Tile tile, Position p) {
@@ -37,38 +42,93 @@ class Board {
     return tile;
   }
 
-  bool checkWord(List<Position> positionList) {
-    if (!positionOccupied(centerSquare)) {
-      return false;
+  // For a play to be valid, the tiles must either connect to a
+  // tile that was placed on a prior turn or pass over the center square
+  bool positionsConnectedToBoard(List<Position> positionList) {
+    for (Position p in positionList) {
+      if (p == centerSquare || _positionBordersPlacedTile(p)) {
+        return true;
+      }
     }
-    if (!_positionsInALine(positionList)) {
-      return false;
-    }
-    return true;
+    return false;
   }
 
-  bool _positionsInALine(List<Position> positionList) {
+  bool _positionBordersPlacedTile(Position p) {
+    for (Direction dir in Direction.values) {
+      Position neighbor = p.getNeighbor(dir);
+      Tile? neighboringTile = getTileAtPosition(neighbor);
+      if (neighboringTile != null && neighboringTile.isPlaced) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool positionsAreInALine(List<Position> positionList) {
     if (positionList.length > 1) {
-      return _positionsInHorizontalLine(positionList) || _positionsInVerticalLine(positionList);
+      return _positionsAreInHorizontalLine(positionList) || _positionsAreInVerticalLine(positionList);
     }
     return true;
   }
 
-  bool _positionsInVerticalLine(List<Position> positionList) {
+  bool _positionsAreInVerticalLine(List<Position> positionList) {
     for (Position p in positionList) {
-      if (p.inAVerticalLineWith(positionList[0])) {
+      if (!p.inAVerticalLineWith(positionList[0])) {
         return false;
       }
     }
     return true;
   }
 
-  bool _positionsInHorizontalLine(List<Position> positionList) {
+  bool _positionsAreInHorizontalLine(List<Position> positionList) {
     for (Position p in positionList) {
-      if (p.inAHorizontalLineWith(positionList[0])) {
+      if (!p.inAHorizontalLineWith(positionList[0])) {
         return false;
       }
     }
     return true;
+  }
+
+  List<Position> getFullWord(List<Position> positionList) {
+    positionList.sort();
+    if (_positionsAreInVerticalLine(positionList)) {
+      return _getWordOffPosition(positionList[0], Direction.north, Direction.south);
+    } else {
+      return _getWordOffPosition(positionList[0], Direction.west, Direction.east);
+    }
+  }
+
+  List<Position> _getWordOffPosition(Position start, Direction up, Direction down) {
+    List<Position> beginningPositions = _getOccupiedPositionBeforePosInDir(start, up);
+    List<Position> endingPositions = _getOccupiedPositionAfterPosInDir(start, down);
+    return beginningPositions + [start] + endingPositions;
+  }
+
+  List<Position> _getOccupiedPositionBeforePosInDir(Position start, Direction dir) {
+    List<Position> positions = [];
+    Position lastPos = start;
+    while (true) {
+      Position nextPos = lastPos.getNeighbor(dir);
+      if (positionOnBoard(nextPos) && positionOccupied(nextPos)) {
+        positions.insert(0, nextPos);
+        lastPos = nextPos;
+      } else {
+        return positions;
+      }
+    }
+  }
+
+  List<Position> _getOccupiedPositionAfterPosInDir(Position start, Direction dir) {
+    List<Position> positions = [];
+    Position lastPos = start;
+    while (true) {
+      Position nextPos = lastPos.getNeighbor(dir);
+      if (positionOnBoard(nextPos) && positionOccupied(nextPos)) {
+        positions.add(nextPos);
+        lastPos = nextPos;
+      } else {
+        return positions;
+      }
+    }
   }
 }

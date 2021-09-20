@@ -19,6 +19,15 @@ class Position implements Comparable {
     }
   }
 
+  bool isNeighbor(Position other) {
+    if (this.inAHorizontalLineWith(other)) {
+      return this.column == other.column + 1 || this.column == other.column - 1;
+    } else if (this.inAVerticalLineWith(other)) {
+      return this.row == other.row + 1 || this.row == other.row - 1;
+    }
+    return false;
+  }
+
   bool inAVerticalLineWith(Position other) {
     return other != this && column == other.column;
   }
@@ -37,6 +46,7 @@ class Position implements Comparable {
   @override
   int get hashCode => this.toString().hashCode;
 
+  // Sort by column then by row
   @override
   int compareTo(other) {
     if (other is Position) {
