@@ -1,6 +1,6 @@
 import 'package:scrabble/game/Direction.dart';
 
-class Position {
+class Position implements Comparable {
   int column;
   int row;
 
@@ -19,6 +19,14 @@ class Position {
     }
   }
 
+  bool inAVerticalLineWith(Position other) {
+    return other != this && column == other.column;
+  }
+
+  bool inAHorizontalLineWith(Position other) {
+    return other != this && row == other.row;
+  }
+
   @override
   bool operator ==(Object other) => other is Position
       && other.column == this.column && other.row == this.row;
@@ -27,6 +35,29 @@ class Position {
   String toString() => "($column, $row)";
 
   @override
-  // TODO: implement hashCode
   int get hashCode => this.toString().hashCode;
+
+  @override
+  int compareTo(other) {
+    if (other is Position) {
+      if (this.column < other.column) {
+        return -1;
+      }
+      if (this.column > other.column) {
+        return 1;
+      }
+      if (this.column == other.column) {
+        if (this.row < other.row) {
+          return -1;
+        }
+        if (this.row > other.row) {
+          return 1;
+        }
+        if (this.row == other.row) {
+          return 0;
+        }
+      }
+    }
+    return 0;
+  }
 }
