@@ -65,14 +65,14 @@ class Board {
   // tile that was placed on a prior turn or pass over the center square
   bool positionsConnectedToBoard(List<Position> positionList) {
     for (Position p in positionList) {
-      if (p == centerSquare || _positionBordersPlacedTile(p)) {
+      if (p == centerSquare || _positionBordersLockedTile(p)) {
         return true;
       }
     }
     return false;
   }
 
-  bool _positionBordersPlacedTile(Position p) {
+  bool _positionBordersLockedTile(Position p) {
     for (Direction dir in Direction.values) {
       Position neighbor = p.getNeighbor(dir);
       Tile? neighboringTile = getTileAtPosition(neighbor);

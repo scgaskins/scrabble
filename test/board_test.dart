@@ -47,6 +47,30 @@ main() {
     assert(b.positionsAreInALine([Position(0, 0), Position(0, 1)]));
     assert(!b.positionsAreInALine([Position(0, 0), Position(0, 2), Position(1, 0)]));
   });
+  test("Test if tiles connected to board", () {
+    Board b = generateBoard({
+      Position(5, 7): Tile('c'),
+      Position(6, 7): Tile('a'),
+      Position(7, 7): Tile('t')
+    });
+    List<Tile> newTiles = [Tile('v'), Tile('s'), Tile('e')];
+    List<Position> newPositions = [Position(6, 6), Position(6, 8), Position(6, 9)];
+    b = addTilesToBoard(b, Map.fromIterables(newPositions, newTiles));
+    print(b);
+    assert(b.positionsConnectedToBoard(newPositions));
+  });
+  test("Test if tiles not connected to board", () {
+    Board b = generateBoard({
+      Position(5, 7): Tile('c'),
+      Position(6, 7): Tile('a'),
+      Position(7, 7): Tile('t')
+    });
+    List<Tile> newTiles = [Tile('v'), Tile('s'), Tile('e')];
+    List<Position> newPositions = [Position(6, 9), Position(6, 10), Position(6, 11)];
+    b = addTilesToBoard(b, Map.fromIterables(newPositions, newTiles));
+    print(b);
+    assert(!b.positionsConnectedToBoard(newPositions));
+  });
   test("Full word test across column", () {
     List<Position> oldPositions = [Position(4, 0), Position(4, 1), Position(4, 2)];
     List<Tile> oldTiles = [Tile('b'), Tile('e'), Tile('t')];
