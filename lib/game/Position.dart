@@ -29,11 +29,11 @@ class Position implements Comparable {
   }
 
   bool inAVerticalLineWith(Position other) {
-    return other != this && column == other.column;
+    return row != other.row && column == other.column;
   }
 
   bool inAHorizontalLineWith(Position other) {
-    return other != this && row == other.row;
+    return column != other.column && row == other.row;
   }
 
   @override

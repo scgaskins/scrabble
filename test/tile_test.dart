@@ -23,7 +23,7 @@ void main() {
     t.resetBlankTile();
     expect(t.letter, " ");
     t.setBlankTile("A");
-    t.placeTile();
+    t.lockTile();
     t.resetBlankTile();
     expect(t.letter, "A");
   });

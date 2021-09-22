@@ -3,13 +3,13 @@ import 'package:scrabble/game/TileScores.dart';
 class Tile {
   String _letter;
   late int _score;
-  late bool _isPlaced;
+  late bool _isLocked;
   late bool _letterIsLocked; // Blank tiles do not have a set letter until played
 
   Tile(this._letter) {
     _letter = _letter.toUpperCase();
     _letterIsLocked = _letter != " ";
-    _isPlaced = false;
+    _isLocked = false;
     _setScore();
   }
 
@@ -17,7 +17,7 @@ class Tile {
 
   int get score => _score;
 
-  bool get isPlaced => _isPlaced;
+  bool get isPlaced => _isLocked;
 
   void _setScore() {
     if (tileScores.containsKey(_letter)) {
@@ -39,8 +39,8 @@ class Tile {
     }
   }
 
-  void placeTile() {
-    _isPlaced = true;
+  void lockTile() {
+    _isLocked = true;
     _letterIsLocked = true;
   }
 
@@ -49,7 +49,7 @@ class Tile {
   Tile.fromJson(Map<String, dynamic> json)
       : _letter = json["letter"],
         _score = json["score"],
-        _isPlaced = true,
+        _isLocked = true,
         _letterIsLocked = true; // All blank tiles on the board have set letters
 
   Map<String, dynamic> toJson() {
@@ -57,5 +57,13 @@ class Tile {
       "letter" : _letter,
       "score"  : _score
     };
+  }
+
+  @override
+  String toString() {
+    if (score >= 10) {
+      return "($_letter: $_score)";
+    }
+    return "($_letter: 0$_score)";
   }
 }
