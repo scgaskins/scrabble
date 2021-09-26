@@ -20,19 +20,26 @@ class Position implements Comparable {
   }
 
   bool isNeighbor(Position other) {
-    if (this.inAHorizontalLineWith(other)) {
+    if (this._inAHorizontalLineWith(other)) {
       return this.column == other.column + 1 || this.column == other.column - 1;
-    } else if (this.inAVerticalLineWith(other)) {
+    } else if (this._inAVerticalLineWith(other)) {
       return this.row == other.row + 1 || this.row == other.row - 1;
     }
     return false;
   }
 
-  bool inAVerticalLineWith(Position other) {
+  bool inALineThruDirectionWith(Position other, Direction dir) {
+    if (dir == Direction.north || dir == Direction.south)
+      return _inAVerticalLineWith(other);
+    else
+      return _inAHorizontalLineWith(other);
+  }
+
+  bool _inAVerticalLineWith(Position other) {
     return row != other.row && column == other.column;
   }
 
-  bool inAHorizontalLineWith(Position other) {
+  bool _inAHorizontalLineWith(Position other) {
     return column != other.column && row == other.row;
   }
 
