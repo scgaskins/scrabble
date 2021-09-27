@@ -71,36 +71,6 @@ main() {
     print(b);
     assert(!b.positionsConnectedToBoard(newPositions));
   });
-  test("Full word test across column", () {
-    List<Position> oldPositions = [Position(4, 0), Position(4, 1), Position(4, 2)];
-    List<Tile> oldTiles = [Tile('b'), Tile('e'), Tile('t')];
-    Board b = generateBoard(Map.fromIterables(oldPositions, oldTiles));
-    print(b);
-    List<Position> newPositions = [Position(4, 3), Position(4, 4), Position(4, 5)];
-    List<Tile> newTiles = [Tile('t'), Tile('e'), Tile('r')];
-    b = addTilesToBoard(b, Map.fromIterables(newPositions, newTiles));
-    print(b);
-    List<Position> fullPositions = b.getFullWord(newPositions);
-    for (Position p in fullPositions) {
-      print(p);
-      assert((oldPositions + newPositions).contains(p));
-    }
-  });
-  test("Full word test across row", () {
-    List<Position> oldPositions = [Position(0, 4), Position(1, 4), Position(2, 4)];
-    List<Tile> oldTiles = [Tile('b'), Tile('e'), Tile('t')];
-    Board b = generateBoard(Map.fromIterables(oldPositions, oldTiles));
-    print(b);
-    List<Position> newPositions = [Position(3, 4), Position(4, 4), Position(5, 4)];
-    List<Tile> newTiles = [Tile('t'), Tile('e'), Tile('r')];
-    b = addTilesToBoard(b, Map.fromIterables(newPositions, newTiles));
-    print(b);
-    List<Position> fullPositions = b.getFullWord(newPositions);
-    for (Position p in fullPositions) {
-      print(p);
-      assert((oldPositions + newPositions).contains(p));
-    }
-  });
 }
 
 Board generateBoard(Map<Position, Tile> tiles) {

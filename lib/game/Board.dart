@@ -98,13 +98,15 @@ class Board {
     return isPositionOnBoard(neighbor) && isPositionOccupied(neighbor);
   }
 
+  // A valid play requires that the new tiles placed on the board
+  // are part of a continuous line that runs horizontally or diagonally
   bool positionsConnectedToEachOther(List<Position> positionList) {
     if (positionsAreInALine(positionList)) {
       List<Position> fullListToEnd;
       if (_positionListRunsInDirection(positionList, Direction.north, Direction.south))
-        fullListToEnd = _getOccupiedPositionAfterPosInDir(positionList[0], Direction.south);
+        fullListToEnd = _getOccupiedPositionsAfterPosInDir(positionList[0], Direction.south);
       else
-        fullListToEnd = _getOccupiedPositionAfterPosInDir(positionList[0], Direction.east);
+        fullListToEnd = _getOccupiedPositionsAfterPosInDir(positionList[0], Direction.east);
       return fullListToEnd.contains(positionList.last);
     }
     return false;
@@ -112,24 +114,15 @@ class Board {
 
   bool positionsAreInALine(List<Position> positionList) {
     if (positionList.length > 1) {
-      return _positionsAreInHorizontalLine(positionList) || _positionsAreInVerticalLine(positionList);
+      return _positionsInALineThruDirection(positionList, Direction.south) || _positionsInALineThruDirection(positionList, Direction.east);
     }
     return true;
   }
 
-  bool _positionsAreInVerticalLine(List<Position> positionList) {
+  bool _positionsInALineThruDirection(List<Position> positionList, Direction dir) {
     for (int i=1; i<positionList.length; i++) {
       Position p = positionList[i];
-      if (!p.inALineThruDirectionWith(positionList[0], Direction.south))
-        return false;
-    }
-    return true;
-  }
-
-  bool _positionsAreInHorizontalLine(List<Position> positionList) {
-    for (int i=1; i<positionList.length; i++) {
-      Position p = positionList[i];
-      if (!p.inALineThruDirectionWith(positionList[0], Direction.east))
+      if (!p.inALineThruDirectionWith(positionList[0], dir))
         return false;
     }
     return true;
@@ -137,39 +130,25 @@ class Board {
 
   List<Position> _getWordPositionsOffPosition(Position start, Direction up, Direction down) {
     List<Position> beginningPositions = _getOccupiedPositionBeforePosInDir(start, up);
-    List<Position> endingPositions = _getOccupiedPositionAfterPosInDir(start, down);
+    List<Position> endingPositions = _getOccupiedPositionsAfterPosInDir(start, down);
     return beginningPositions + [start] + endingPositions;
   }
 
   List<Position> _getOccupiedPositionBeforePosInDir(Position start, Direction dir) {
     List<Position> positions = [];
-    Position lastPos = start;
-    while (true) {
-      Position nextPos = lastPos.getNeighbor(dir);
-      if (isPositionOnBoard(nextPos) && isPositionOccupied(nextPos)) {
-        positions.insert(0, nextPos);
-        lastPos = nextPos;
-      } else {
-        return positions;
-      }
-    }
+    for (Position pos=start.getNeighbor(dir); isPositionOnBoard(pos) && isPositionOccupied(pos); pos=pos.getNeighbor(dir))
+      positions.insert(0, pos);
+    return positions;
   }
 
-  List<Position> _getOccupiedPositionAfterPosInDir(Position start, Direction dir) {
+  List<Position> _getOccupiedPositionsAfterPosInDir(Position start, Direction dir) {
     List<Position> positions = [];
-    Position lastPos = start;
-    while (true) {
-      Position nextPos = lastPos.getNeighbor(dir);
-      if (isPositionOnBoard(nextPos) && isPositionOccupied(nextPos)) {
-        positions.add(nextPos);
-        lastPos = nextPos;
-      } else {
-        return positions;
-      }
-    }
+    for (Position pos=start.getNeighbor(dir); isPositionOnBoard(pos) && isPositionOccupied(pos); pos=pos.getNeighbor(dir))
+      positions.add(pos);
+    return positions;
   }
   
-  Map<String, int> getAllIntersectingWordsAndScores(List<Position> positionList) {
+  Map<String, int> getWordsAndScoresOffList(List<Position> positionList) {
     if (_positionListRunsInDirection(positionList, Direction.north, Direction.south))
       return _getAllWordsAndScores(positionList, Direction.north, Direction.south, Direction.west, Direction.east);
     else
@@ -177,14 +156,19 @@ class Board {
   }
   
   Map<String, int> _getAllWordsAndScores(List<Position> positionList, Direction up, Direction down, Direction left, Direction right) {
-    List<MapEntry<String, int>> wordsAndScores = [];
     List<Position> initialWordPositions = _getWordPositionsOffPosition(positionList.first, up, down);
+    List<MapEntry<String, int>> wordsAndScores = _getAllIntersectingWordsAndScores(initialWordPositions, left, right);
     wordsAndScores.add(_getWordAndScoreFromPositionList(initialWordPositions));
-    for (Position pos in initialWordPositions) {
-      List<Position> intersectingWordPositions = _getWordPositionsOffPosition(pos, left, right);
+    return Map.fromEntries(wordsAndScores);
+  }
+
+  List<MapEntry<String, int>> _getAllIntersectingWordsAndScores(List<Position> positionList, Direction left, Direction right) {
+    List<MapEntry<String, int>> wordsAndScores = [];
+    for (Position p in positionList) {
+      List<Position> intersectingWordPositions = _getWordPositionsOffPosition(p, left, right);
       wordsAndScores.add(_getWordAndScoreFromPositionList(intersectingWordPositions));
     }
-    return Map.fromEntries(wordsAndScores);
+    return wordsAndScores;
   }
 
   MapEntry<String, int> _getWordAndScoreFromPositionList(List<Position> wordPositions) {
@@ -194,12 +178,14 @@ class Board {
     bool tripleWord = false;
     for (Position pos in wordPositions) {
       Tile tile = getTileAtPosition(pos)!;
-      word += tile.letter;
+      word += tile.letter.toLowerCase();
       score += _calculateTileScore(pos, tile);
-      if (doubleWordSquares.contains(pos))
-        doubleWord = true;
-      else if (tripleWordSquares.contains(pos))
-        tripleWord = true;
+      if (!tile.isLocked) { // Premium letter squares only apply to newly placed tiles
+        if (doubleWordSquares.contains(pos))
+          doubleWord = true;
+        else if (tripleWordSquares.contains(pos))
+          tripleWord = true;
+      }
     }
     if (doubleWord)
       score *= 2;
