@@ -2,6 +2,7 @@ import 'package:scrabble/game/Direction.dart';
 import 'package:scrabble/game/Position.dart';
 import 'package:scrabble/game/Tile.dart';
 import 'package:scrabble/game/PremiumSquares.dart';
+import 'package:scrabble/utility/Pair.dart';
 
 class Board {
   final int boardSize = 15;
@@ -148,30 +149,34 @@ class Board {
     return positions;
   }
   
-  Map<String, int> getWordsAndScoresOffList(List<Position> positionList) {
+  List<Pair<String, int>> getWordsAndScoresOffList(List<Position> positionList) {
     if (_positionListRunsInDirection(positionList, Direction.north, Direction.south))
-      return _getAllWordsAndScores(positionList, Direction.north, Direction.south, Direction.west, Direction.east);
+      return _getAllNewWordsAndScores(positionList, Direction.north, Direction.south, Direction.west, Direction.east);
     else
-      return _getAllWordsAndScores(positionList, Direction.west, Direction.east, Direction.north, Direction.south);
+      return _getAllNewWordsAndScores(positionList, Direction.west, Direction.east, Direction.north, Direction.south);
   }
   
-  Map<String, int> _getAllWordsAndScores(List<Position> positionList, Direction up, Direction down, Direction left, Direction right) {
+  List<Pair<String, int>> _getAllNewWordsAndScores(List<Position> positionList, Direction up, Direction down, Direction left, Direction right) {
     List<Position> initialWordPositions = _getWordPositionsOffPosition(positionList.first, up, down);
-    List<MapEntry<String, int>> wordsAndScores = _getAllIntersectingWordsAndScores(initialWordPositions, left, right);
+    List<Pair<String, int>> wordsAndScores = _getAllNewIntersectingWordsAndScores(initialWordPositions, left, right);
     wordsAndScores.add(_getWordAndScoreFromPositionList(initialWordPositions));
-    return Map.fromEntries(wordsAndScores);
+    return wordsAndScores;
   }
 
-  List<MapEntry<String, int>> _getAllIntersectingWordsAndScores(List<Position> positionList, Direction left, Direction right) {
-    List<MapEntry<String, int>> wordsAndScores = [];
+  List<Pair<String, int>> _getAllNewIntersectingWordsAndScores(List<Position> positionList, Direction left, Direction right) {
+    List<Pair<String, int>> wordsAndScores = [];
     for (Position p in positionList) {
-      List<Position> intersectingWordPositions = _getWordPositionsOffPosition(p, left, right);
-      wordsAndScores.add(_getWordAndScoreFromPositionList(intersectingWordPositions));
+      Tile tile = getTileAtPosition(p)!;
+      if (!tile.isLocked) { // Only looking at new tiles
+        List<Position> intersectingWordPositions = _getWordPositionsOffPosition(p, left, right);
+        if (intersectingWordPositions.length > 1) // One letter words are not valid
+          wordsAndScores.add(_getWordAndScoreFromPositionList(intersectingWordPositions));
+      }
     }
     return wordsAndScores;
   }
 
-  MapEntry<String, int> _getWordAndScoreFromPositionList(List<Position> wordPositions) {
+  Pair<String, int> _getWordAndScoreFromPositionList(List<Position> wordPositions) {
     String word = "";
     int score = 0;
     bool doubleWord = false;
@@ -191,15 +196,15 @@ class Board {
       score *= 2;
     if (tripleWord)
       score *= 3;
-    return MapEntry(word, score);
+    return Pair(word, score);
   }
 
   int _calculateTileScore(Position tilePos, Tile tile) {
     if (!tile.isLocked) { // Premium letter squares only apply to newly placed tiles
       if (doubleLetterSquares.contains(tilePos))
-        return tile.score * 3;
-      if (tripleLetterSquares.contains(tilePos))
         return tile.score * 2;
+      if (tripleLetterSquares.contains(tilePos))
+        return tile.score * 3;
     }
     return tile.score;
   }
