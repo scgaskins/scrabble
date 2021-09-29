@@ -1,4 +1,4 @@
-import 'package:scrabble/game/Position.dart';
+import 'package:scrabble/utility/Position.dart';
 
 final Set<Position> doubleLetterSquares = {
   Position(3, 0),  Position(11, 0), Position(6, 2),  Position(8, 2),

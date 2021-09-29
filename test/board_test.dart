@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:scrabble/game/Board.dart';
-import 'package:scrabble/game/Position.dart';
+import 'package:scrabble/utility/Position.dart';
 import 'package:scrabble/game/Tile.dart';
 import 'package:scrabble/utility/Pair.dart';
 
@@ -136,6 +136,12 @@ main() {
     List<Tile> newTiles = [Tile('o'), Tile('u'), Tile('p'), Tile('s')];
     List<Position> newPositions = [Position(8, 7), Position(9, 7), Position(10, 7), Position(11, 7)];
     List<Pair<String, int>> expectedWordsAndScores = [Pair("soups", 8)];
+    wordsAndScoresTest(newTiles, newPositions, expectedWordsAndScores);
+  });
+  test("Test of word with w on triple letter", () {
+    List<Tile> newTiles = [Tile('w'), Tile('r'), Tile('p')];
+    List<Position> newPositions = [Position(5, 9), Position(6, 9), Position(8, 9)];
+    List<Pair<String, int>> expectedWordsAndScores = [Pair("wrap", 17)];
     wordsAndScoresTest(newTiles, newPositions, expectedWordsAndScores);
   });
   test("Test of three new words, k on double letter", () {

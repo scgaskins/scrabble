@@ -1,4 +1,4 @@
-import 'package:scrabble/game/Direction.dart';
+import 'Direction.dart';
 
 class Position implements Comparable {
   int column;

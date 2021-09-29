@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:scrabble/game/Direction.dart';
-import 'package:scrabble/game/Position.dart';
+import 'package:scrabble/utility/Direction.dart';
+import 'package:scrabble/utility/Position.dart';
 
 main() {
   test("Positions with same column and row should be equal", () {
