@@ -39,7 +39,7 @@ main() {
     Position tilePos = new Position(0, 0);
     b.addTileToPosition(tile, tilePos);
     b.lockTiles([tilePos]);
-    assert(b.removeTileFromPosition(tilePos) == null);
+    expect(() => b.removeTileFromPosition(tilePos), throwsException);
     assert(b.getTileAtPosition(tilePos) == tile);
   });
   test("Positions in line test", (){

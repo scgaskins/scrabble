@@ -22,11 +22,15 @@ class TileBag {
 
   int letterCount(String letter) => _lettersRemaining[letter]!;
 
+  void _incrementLetterAmount(String letter, int change) {
+    _lettersRemaining[letter] = _lettersRemaining[letter]! + change;
+    _tileCount += change;
+  }
+
   void addTileToBag(Tile tile) {
     if (_lettersRemaining.containsKey(tile.letter)) {
       if (_lettersRemaining[tile.letter]! < _initialDistribution[tile.letter]!) {
-        _lettersRemaining[tile.letter] = _lettersRemaining[tile.letter]! + 1;
-        _tileCount += 1;
+        _incrementLetterAmount(tile.letter, 1);
       }
       else throw Exception("There are already ${_initialDistribution[tile.letter]} copies of ${tile.letter}");
     }
@@ -43,8 +47,7 @@ class TileBag {
   Tile _getTileWithLetter(String letter) {
     letter = letter.toUpperCase();
     if (_lettersRemaining.containsKey(letter) && _lettersRemaining[letter]! > 0) {
-      _lettersRemaining[letter] = _lettersRemaining[letter]! - 1;
-      _tileCount -= 1;
+      _incrementLetterAmount(letter, -1);
       return Tile(letter);
     }
     throw Exception("There aren't any $letter tiles in the bag");

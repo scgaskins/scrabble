@@ -49,7 +49,7 @@ class Board {
       if (!tile.isLocked) {
         _board[p.column][p.row] = null;
         tile.resetBlankTile();
-      } else return null;
+      } else throw Exception("The tile at $p is locked in place");
     }
     return tile;
   }
@@ -179,22 +179,22 @@ class Board {
   Pair<String, int> _getWordAndScoreFromPositionList(List<Position> wordPositions) {
     String word = "";
     int score = 0;
-    bool doubleWord = false;
-    bool tripleWord = false;
+    int doubleWord = 0;
+    int tripleWord = 0;
     for (Position pos in wordPositions) {
       Tile tile = getTileAtPosition(pos)!;
       word += tile.letter.toLowerCase();
       score += _calculateTileScore(pos, tile);
       if (!tile.isLocked) { // Premium letter squares only apply to newly placed tiles
         if (doubleWordSquares.contains(pos))
-          doubleWord = true;
+          doubleWord += 1;
         else if (tripleWordSquares.contains(pos))
-          tripleWord = true;
+          tripleWord += 1;
       }
     }
-    if (doubleWord)
+    for (int i=0; i<doubleWord; i++)
       score *= 2;
-    if (tripleWord)
+    for (int i=0; i<tripleWord; i++)
       score *= 3;
     return Pair(word, score);
   }
