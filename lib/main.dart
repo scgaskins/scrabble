@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'package:scrabble/Authentication.dart';
+import 'package:scrabble/Pages/Start.dart';
 
 void main() {
   runApp(App());
@@ -29,11 +32,14 @@ class _AppState extends State<App> {
 
         // Once complete, show your application
         if (snapshot.connectionState == ConnectionState.done) {
-          return MyApp();
+          return ChangeNotifierProvider(
+              create: (context) => Authentication(),
+            builder: (context, _) => MyApp(),
+          );
         }
 
         // Otherwise, show something whilst waiting for initialization to complete
-        return Loading();
+        return CircularProgressIndicator();
       },
     );
   }
@@ -55,18 +61,6 @@ class ErrorPageState extends State<ErrorPage> {
   }
 }
 
-class Loading extends StatefulWidget {
-  @override
-  State createState() => new LoadingState();
-}
-
-class LoadingState extends State<Loading> {
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text("Please wait", textDirection: TextDirection.ltr,));
-  }
-}
-
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -79,55 +73,11 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       routes: {
-        '/': (context) => MyHomePage(title: "title")
+        '/': (context) => Consumer<Authentication>(
+          builder: (context, authState, _) => Start(logInState: authState.logInState),
+        ),
       },
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
-}
