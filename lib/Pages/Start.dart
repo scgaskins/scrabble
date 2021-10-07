@@ -9,11 +9,13 @@ class Start extends StatelessWidget {
     required this.logInState
   });
 
-  final LogInState logInState;
+  final LogInState? logInState;
 
   @override
   Widget build(BuildContext context) {
-    if (logInState == LogInState.loggedOut) {
+    if (logInState == null) {
+      return CircularProgressIndicator();
+    } else if (logInState == LogInState.loggedOut) {
       return AuthenticationPage();
     } else
       return BottomNavPage();

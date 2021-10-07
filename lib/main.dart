@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:scrabble/Authentication.dart';
 import 'package:scrabble/Pages/Start.dart';
+import 'package:scrabble/Pages/RegisterPage.dart';
 
 void main() {
   runApp(App());
@@ -76,6 +77,9 @@ class MyApp extends StatelessWidget {
         '/': (context) => Consumer<Authentication>(
           builder: (context, authState, _) => Start(logInState: authState.logInState),
         ),
+        '/register': (context) => Consumer<Authentication>(
+          builder: (context, authState, _) => RegisterPage(signUp: authState.registerAccount),
+        )
       },
     );
   }
