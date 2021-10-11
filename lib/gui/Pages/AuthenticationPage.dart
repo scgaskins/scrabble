@@ -13,7 +13,7 @@ class AuthenticationPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             ElevatedButton(
-                onPressed: () {},
+                onPressed: () => Navigator.of(context).pushNamed("/signIn"),
                 child: Text("Sign In")
             ),
             ElevatedButton(

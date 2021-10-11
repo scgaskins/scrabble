@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:scrabble/Authentication.dart';
-import 'package:scrabble/Pages/AuthenticationPage.dart';
-import 'package:scrabble/Pages/BottomNavPage.dart';
+import 'package:scrabble/gui/Pages/AuthenticationPage.dart';
+import 'package:scrabble/gui/Pages/BottomNavPage.dart';
 
 class Start extends StatelessWidget {
   const Start({

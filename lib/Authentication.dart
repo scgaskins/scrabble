@@ -6,13 +6,16 @@ enum LogInState { loggedIn, loggedOut }
 class Authentication extends ChangeNotifier {
   FirebaseAuth _auth = FirebaseAuth.instance;
   LogInState? logInState;
+  String? displayName;
 
   Authentication() {
     _auth.userChanges().listen((User? user) {
       if (user == null) {
         logInState = LogInState.loggedOut;
-      } else
+      } else {
         logInState = LogInState.loggedIn;
+        displayName = user.displayName;
+      }
       notifyListeners();
     });
   }

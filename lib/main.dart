@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:scrabble/Authentication.dart';
-import 'package:scrabble/Pages/Start.dart';
-import 'package:scrabble/Pages/RegisterPage.dart';
+import 'package:scrabble/gui/Pages/Start.dart';
+import 'package:scrabble/gui/Pages/RegisterPage.dart';
+import 'package:scrabble/gui/Pages/SignInPage.dart';
 
 void main() {
   runApp(App());
@@ -79,6 +80,9 @@ class MyApp extends StatelessWidget {
         ),
         '/register': (context) => Consumer<Authentication>(
           builder: (context, authState, _) => RegisterPage(signUp: authState.registerAccount),
+        ),
+        "/signIn": (context) => Consumer<Authentication>(
+          builder: (context, authState, _) => SignInPage(signIn: authState.signIn)
         )
       },
     );
