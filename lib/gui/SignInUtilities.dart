@@ -10,7 +10,7 @@ TextFormField signInForm(String label, TextEditingController controller, {bool o
     controller: controller,
     obscureText: obscureText,
     validator: (String? value) {
-      return (value != null) ? 'This field is required' : null;
+      return (value == null || value.length == 0) ? 'This field is required' : null;
     },
   );
 }

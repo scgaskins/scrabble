@@ -5,7 +5,7 @@ import 'package:scrabble/gui/SignInUtilities.dart';
 class RegisterPage extends StatefulWidget {
   RegisterPage({Key? key, required this.signUp}) : super(key: key);
 
-  final Future<void> Function(
+  final Future<bool> Function(
       String username,
       String email,
       String password,
@@ -17,6 +17,7 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  GlobalKey<FormState> _formKey = GlobalKey(debugLabel: "_registerForm");
   TextEditingController _usernameController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
@@ -24,31 +25,36 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title:
-      Text("Register"),
-      ),
+      appBar: AppBar(title: Text("Register"),),
       body: Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            signInForm("Username", _usernameController),
-            signInForm("Email", _emailController),
-            signInForm("Password", _passwordController, obscureText: true),
-            ElevatedButton(
-                onPressed: () async {
-                  await widget.signUp(
-                    _usernameController.text,
-                    _emailController.text,
-                    _passwordController.text,
-                      (e) => showErrorDialogue(context, "Registration Failed", e)
-                  );
-                  Navigator.of(context).pop();
-                },
-                child: Text("Sign Up")
-            )
-          ],
-        ),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                signInForm("Username", _usernameController),
+                signInForm("Email", _emailController),
+                signInForm("Password", _passwordController, obscureText: true),
+                ElevatedButton(
+                    onPressed: () async {
+                      if (_formKey.currentState!.validate()) {
+                        bool registrationSuccessful = await widget.signUp(
+                            _usernameController.text,
+                            _emailController.text,
+                            _passwordController.text,
+                                (e) =>
+                                    showErrorDialogue(context, "Registration Failed", e)
+                        );
+                        if (registrationSuccessful) {
+                          Navigator.of(context).pop();
+                        }
+                      }},
+                    child: Text("Sign Up")
+                )
+              ],
+            ),
+          )
       ),
     );
   }

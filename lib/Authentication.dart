@@ -20,20 +20,24 @@ class Authentication extends ChangeNotifier {
     });
   }
 
-  Future<void> signIn(String email, String password, void Function(FirebaseAuthException e) errorCallback) async {
+  Future<bool> signIn(String email, String password, void Function(FirebaseAuthException e) errorCallback) async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
+      return true;
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
+      return false;
     }
   }
 
-  Future<void> registerAccount(String username, String email, String password, void Function(FirebaseAuthException e) errorCallback) async {
+  Future<bool> registerAccount(String username, String email, String password, void Function(FirebaseAuthException e) errorCallback) async {
     try {
       UserCredential cred = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       await cred.user!.updateDisplayName(username);
+      return true;
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
+      return false;
     }
   }
 
