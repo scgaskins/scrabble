@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 class ProfilePage extends StatefulWidget {
   ProfilePage({Key? key, required this.signOut, required this.userName}) : super(key: key);
 
-  void Function() signOut;
-  String? userName;
+  final void Function() signOut;
+  final String? userName;
 
   @override
   State<StatefulWidget> createState() => _ProfilePageState();

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:scrabble/Authentication.dart';
+import 'package:scrabble/FriendAccess.dart';
 import 'FriendsPage.dart';
 import 'ProfilePage.dart';
 import 'GamesPage.dart';
@@ -20,9 +21,12 @@ class _BottomNavPageState extends State<BottomNavPage> {
       Consumer<Authentication>(
           builder: (context, authState, _) => ProfilePage(signOut: authState.signOut, userName: authState.displayName,)
       ),
-      FriendsPage(),
+      Consumer<Authentication>(
+          builder: (context, authState, _) => FriendsPage(friendAccess: FriendAccess(authState.userId!),)
+      ),
       GamesPage()
     ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text("Scrabble"),

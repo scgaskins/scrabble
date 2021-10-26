@@ -12,11 +12,11 @@ class Start extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (logInState == null) {
-      return CircularProgressIndicator();
-    } else if (logInState == LogInState.loggedOut) {
+    if (logInState == LogInState.loggedOut) {
       return AuthenticationPage();
-    } else
+    } else if (logInState == LogInState.loggedIn) {
       return BottomNavPage();
+    } else
+      return CircularProgressIndicator();
   }
 }
