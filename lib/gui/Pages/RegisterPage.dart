@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:scrabble/gui/SignInUtilities.dart';
+import 'package:scrabble/gui/GeneralUtilities.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({Key? key, required this.signUp}) : super(key: key);
@@ -33,9 +33,9 @@ class _RegisterPageState extends State<RegisterPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                signInForm("Username", _usernameController),
-                signInForm("Email", _emailController),
-                signInForm("Password", _passwordController, obscureText: true),
+                submissionForm("Username", _usernameController),
+                submissionForm("Email", _emailController),
+                submissionForm("Password", _passwordController, obscureText: true),
                 ElevatedButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
@@ -44,7 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             _emailController.text,
                             _passwordController.text,
                                 (e) =>
-                                    showErrorDialogue(context, "Registration Failed", e)
+                                    showErrorDialogue(context, "Registration Failed", e.code)
                         );
                         if (registrationSuccessful) {
                           Navigator.of(context).pop();

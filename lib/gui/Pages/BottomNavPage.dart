@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:scrabble/Authentication.dart';
-import 'package:scrabble/FriendAccess.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:scrabble/networking/Authentication.dart';
+import 'package:scrabble/networking/FriendAccess.dart';
 import 'FriendsPage.dart';
 import 'ProfilePage.dart';
 import 'GamesPage.dart';
@@ -14,6 +15,7 @@ class BottomNavPage extends StatefulWidget {
 class _BottomNavPageState extends State<BottomNavPage> {
   late List<Widget> _tabs;
   int _currentIndex = 0;
+  FirebaseFirestore _database = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +24,7 @@ class _BottomNavPageState extends State<BottomNavPage> {
           builder: (context, authState, _) => ProfilePage(signOut: authState.signOut, userName: authState.displayName,)
       ),
       Consumer<Authentication>(
-          builder: (context, authState, _) => FriendsPage(friendAccess: FriendAccess(authState.userId!),)
+          builder: (context, authState, _) => FriendsPage(friendAccess: FriendAccess(_database, authState.userId!),)
       ),
       GamesPage()
     ];

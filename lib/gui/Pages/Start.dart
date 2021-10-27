@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:scrabble/Authentication.dart';
+import 'package:scrabble/networking/Authentication.dart';
 import 'package:scrabble/gui/Pages/AuthenticationPage.dart';
 import 'package:scrabble/gui/Pages/BottomNavPage.dart';
 

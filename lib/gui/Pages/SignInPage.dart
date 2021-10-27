@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:scrabble/gui/SignInUtilities.dart';
+import 'package:scrabble/gui/GeneralUtilities.dart';
 
 class SignInPage extends StatefulWidget {
   SignInPage({Key? key, required this.signIn}) : super(key: key);
@@ -33,8 +33,8 @@ class _SignInPageState extends State<SignInPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              signInForm("Email", _emailController),
-              signInForm("Password", _passwordController, obscureText: true),
+              submissionForm("Email", _emailController),
+              submissionForm("Password", _passwordController, obscureText: true),
               ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
@@ -42,7 +42,7 @@ class _SignInPageState extends State<SignInPage> {
                           _emailController.text,
                           _passwordController.text,
                               (e) =>
-                              showErrorDialogue(context, "Sign In Failed", e)
+                              showErrorDialogue(context, "Sign In Failed", e.code)
                       );
                       if (signInSuccessful) {
                         Navigator.of(context).pop();
