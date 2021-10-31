@@ -9,7 +9,12 @@ class _GamesPageState extends State<GamesPage> {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text("Games Page"),
+      child: ElevatedButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed("/game");
+        },
+        child: Text("Game"),
+      ),
     );
   }
 }

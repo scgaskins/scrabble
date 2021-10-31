@@ -5,6 +5,7 @@ import 'package:scrabble/networking/Authentication.dart';
 import 'package:scrabble/gui/Pages/Start.dart';
 import 'package:scrabble/gui/Pages/RegisterPage.dart';
 import 'package:scrabble/gui/Pages/SignInPage.dart';
+import 'package:scrabble/gui/Pages/GamePage.dart';
 
 void main() {
   runApp(App());
@@ -83,7 +84,8 @@ class MyApp extends StatelessWidget {
         ),
         "/signIn": (context) => Consumer<Authentication>(
           builder: (context, authState, _) => SignInPage(signIn: authState.signIn)
-        )
+        ),
+        "/game": (context) => GamePage(),
       },
     );
   }

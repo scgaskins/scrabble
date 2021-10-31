@@ -6,7 +6,6 @@ import 'package:scrabble/networking/FriendAccess.dart';
 import 'FriendsPage.dart';
 import 'ProfilePage.dart';
 import 'GamesPage.dart';
-import 'GamePage.dart';
 
 class BottomNavPage extends StatefulWidget {
   @override
@@ -27,8 +26,7 @@ class _BottomNavPageState extends State<BottomNavPage> {
       Consumer<Authentication>(
           builder: (context, authState, _) => FriendsPage(friendAccess: FriendAccess(_database, authState.userId!),)
       ),
-      //GamesPage()
-      GamePage()
+      GamesPage(),
     ];
 
     return Scaffold(

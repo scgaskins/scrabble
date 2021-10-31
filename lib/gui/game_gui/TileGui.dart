@@ -7,10 +7,10 @@ class TileGui extends StatelessWidget {
   final Tile tile;
   final double? height;
   final double? width;
+  final TextStyle _tileStyle = TextStyle(fontSize: 14, color: Colors.black);
 
   @override
   Widget build(BuildContext context) {
-    print(tile.score.toString());
     return Container(
       color: Colors.amberAccent,
       height: height,
@@ -20,10 +20,11 @@ class TileGui extends StatelessWidget {
           Text(
             tile.letter,
             textAlign: TextAlign.center,
+            style: _tileStyle,
           ),
           Text(
             tile.letter != " " ? tile.score.toString() : " ",
-            style: DefaultTextStyle.of(context).style.apply(fontSizeFactor: 0.6),
+            style: _tileStyle.apply(fontSizeFactor: 0.6),
           )
         ],
       ),
