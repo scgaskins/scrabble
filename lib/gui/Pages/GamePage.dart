@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:scrabble/gui/game_gui/BoardSquare.dart';
-import 'package:scrabble/gui/game_gui/TileGui.dart';
+import 'package:scrabble/gui/game_gui/BoardGui.dart';
 import 'package:scrabble/gui/game_gui/PlayerHand.dart';
-import 'package:scrabble/gui/game_gui/BoardSquareGui.dart';
 import 'package:scrabble/utility/Position.dart';
 import 'package:scrabble/game/Tile.dart';
+import 'package:scrabble/game/Board.dart';
 
 class GamePage extends StatefulWidget {
   GamePage({Key? key}): super(key: key);
@@ -30,6 +29,15 @@ class _GamePageState extends State<GamePage> {
       tileWidth: (MediaQuery.of(context).size.width-20) / 15,
       tileHeight: (MediaQuery.of(context).size.width-20) / 15,
     );
+    Board b = Board();
+    List<Position> currentPositions = [];
+    BoardGui boardGui = BoardGui(
+      board: b,
+      currentPositions: currentPositions,
+      boardSize: 15,
+      tileHeight: (MediaQuery.of(context).size.width-20) / 15,
+      tileWidth: (MediaQuery.of(context).size.width-20) / 15,
+    );
     return Scaffold(
       appBar: AppBar(
         title: Text("Game Preview"),
@@ -37,16 +45,7 @@ class _GamePageState extends State<GamePage> {
         body: Center(
           child: Column(
             children: [
-              BoardSquare(
-                position: Position(0,0),
-                width: (MediaQuery.of(context).size.width-20) / 15,
-                height: (MediaQuery.of(context).size.width-20) / 15,
-              ),
-              BoardSquare(
-                position: Position(7,7),
-                width: (MediaQuery.of(context).size.width-20) / 15,
-                height: (MediaQuery.of(context).size.width-20) / 15,
-              ),
+             boardGui,
               handGUI
             ],
           ),

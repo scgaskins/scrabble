@@ -7,9 +7,11 @@ import 'package:scrabble/gui/game_gui/DraggableTile.dart';
 import 'package:scrabble/gui/game_gui/TileTarget.dart';
 
 class BoardSquare extends StatefulWidget {
-  BoardSquare({Key? key, required this.position, this.width, this.height,}): super(key: key);
+  BoardSquare({Key? key, required this.position, required this.onTileReceived, required this.onTileRemoved, this.width, this.height,}): super(key: key);
 
   final Position position;
+  final void Function(Tile?, Position) onTileReceived;
+  final void Function(Position) onTileRemoved;
   final double? width;
   final double? height;
 
@@ -41,6 +43,7 @@ class _BoardSquareState extends State<BoardSquare> {
   void _receiveTile(Tile? tile) {
     setState(() {
       this.tile = tile;
+      widget.onTileReceived(tile, widget.position);
     });
   }
 
@@ -65,6 +68,7 @@ class _BoardSquareState extends State<BoardSquare> {
   void _removeTileFromSquare() {
     setState(() {
       tile = null;
+      widget.onTileRemoved(widget.position);
     });
   }
 
