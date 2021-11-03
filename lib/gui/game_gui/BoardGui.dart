@@ -62,24 +62,11 @@ class _BoardGuiState extends State<BoardGui> {
   BoardSquare _boardSquare(Position p) {
     return BoardSquare(
       position: p,
-      onTileReceived: _addTileToBoard,
-      onTileRemoved: _removeTileFromBoard,
+      board: widget.board,
+      currentPositions: widget.currentPositions,
       setBlankTileController: _setBlankTileController,
       height: widget.tileHeight,
       width: widget.tileWidth,
     );
-  }
-
-  void _addTileToBoard(Tile? tile, Position p) {
-    if (tile != null) {
-      widget.board.addTileToPosition(tile, p);
-      widget.currentPositions.add(p);
-    }
-  }
-
-  void _removeTileFromBoard(Position p) {
-    widget.board.removeTileFromPosition(p);
-    widget.currentPositions.remove(p);
-    print(widget.currentPositions);
   }
 }

@@ -13,6 +13,7 @@ class Game {
     board = Board();
     _tileBag = TileBag();
     userHand = List.filled(7, null);
+    fillUserHand();
   }
 
   void fillUserHand() {
@@ -20,5 +21,13 @@ class Game {
       if (userHand[i] == null)
         userHand[i] = _tileBag.drawTile();
     }
+  }
+
+  List<String> findInvalidWords(List<String> words) {
+    List<String> invalidWords = [];
+    for (String word in words)
+      if (!validWords.contains(word))
+        invalidWords.add(word);
+    return invalidWords;
   }
 }

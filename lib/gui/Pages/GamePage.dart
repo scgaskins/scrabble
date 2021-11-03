@@ -22,6 +22,7 @@ class _GamePageState extends State<GamePage> {
     null,
     Tile(" ")
   ];
+  Board b = Board();
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +31,6 @@ class _GamePageState extends State<GamePage> {
       tileWidth: (MediaQuery.of(context).size.width-20) / 15,
       tileHeight: (MediaQuery.of(context).size.width-20) / 15,
     );
-    Board b = Board();
     List<Position> currentPositions = [];
     BoardGui boardGui = BoardGui(
       board: b,

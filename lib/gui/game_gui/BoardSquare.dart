@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:scrabble/utility/Position.dart';
 import 'package:scrabble/game/classes/Tile.dart';
+import 'package:scrabble/game/classes/Board.dart';
 import 'package:scrabble/gui/game_gui/BoardSquareGui.dart';
 import 'package:scrabble/gui/game_gui/TileGui.dart';
 import 'package:scrabble/gui/game_gui/DraggableTile.dart';
@@ -9,16 +10,16 @@ import 'package:scrabble/gui/game_gui/TileTarget.dart';
 class BoardSquare extends StatefulWidget {
   BoardSquare({Key? key,
     required this.position,
-    required this.onTileReceived,
-    required this.onTileRemoved,
+    required this.board,
+    required this.currentPositions,
     required this.setBlankTileController,
     this.width,
     this.height,
   }): super(key: key);
 
   final Position position;
-  final void Function(Tile?, Position) onTileReceived;
-  final void Function(Position) onTileRemoved;
+  final Board board;
+  final List<Position> currentPositions; // All the board positions with tiles that aren't locked yet
   final TextEditingController setBlankTileController;
   final double? width;
   final double? height;
@@ -28,19 +29,20 @@ class BoardSquare extends StatefulWidget {
 }
 
 class _BoardSquareState extends State<BoardSquare> {
-  Tile? tile;
   GlobalKey<FormState> _setBlankTileFormKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
-    if (tile == null) {
+    if (_tile == null) {
       return _tileTarget();
-    } else if (!tile!.isLocked) {
+    } else if (!_tile!.isLocked) {
       return _draggableTile();
     } else {
       return _staticTile();
     }
   }
+
+  Tile? get _tile => widget.board.getTileAtPosition(widget.position);
 
   TileTarget _tileTarget() {
     return TileTarget(
@@ -51,10 +53,14 @@ class _BoardSquareState extends State<BoardSquare> {
 
   void _receiveTile(Tile? tile) {
     setState(() {
-      this.tile = tile;
-      if (this.tile != null && !this.tile!.letterIsLocked)
-        _showSetBlankTileDialog();
-      widget.onTileReceived(tile, widget.position);
+      print(tile);
+      if (tile != null) {
+        widget.board.addTileToPosition(tile, widget.position);
+        if (!_tile!.letterIsLocked)
+          _showSetBlankTileDialog();
+        widget.currentPositions.add(widget.position);
+        print(widget.board);
+      }
     });
   }
 
@@ -68,7 +74,7 @@ class _BoardSquareState extends State<BoardSquare> {
 
   DraggableTile _draggableTile() {
     return DraggableTile(
-      tile: tile!,
+      tile: _tile!,
       width: widget.width,
       height: widget.height,
       childWhenDragging: _boardSquareGui(),
@@ -78,14 +84,15 @@ class _BoardSquareState extends State<BoardSquare> {
 
   void _removeTileFromSquare() {
     setState(() {
-      tile = null;
-      widget.onTileRemoved(widget.position);
+      widget.board.removeTileFromPosition(widget.position);
+      widget.currentPositions.remove(widget.position);
+      print(widget.currentPositions);
     });
   }
 
   TileGui _staticTile() {
     return TileGui(
-      tile: tile!,
+      tile: _tile!,
       height: widget.height,
       width: widget.width,
     );
@@ -115,9 +122,11 @@ class _BoardSquareState extends State<BoardSquare> {
           ElevatedButton(
             child: Text("Submit"),
             onPressed: () {
+              print(_setBlankTileFormKey.currentState);
+              print(widget.board);
               if (_setBlankTileFormKey.currentState!.validate()) {
                 setState(() {
-                  tile!.setBlankTile(widget.setBlankTileController.text);
+                  _tile!.setBlankTile(widget.setBlankTileController.text);
                 });
                 Navigator.of(context).pop();
               }
