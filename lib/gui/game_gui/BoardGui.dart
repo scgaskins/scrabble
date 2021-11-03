@@ -18,6 +18,8 @@ class BoardGui extends StatefulWidget {
 }
 
 class _BoardGuiState extends State<BoardGui> {
+  TextEditingController _setBlankTileController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return _generateBoardSquares();
@@ -56,6 +58,7 @@ class _BoardGuiState extends State<BoardGui> {
       position: p,
       onTileReceived: _addTileToBoard,
       onTileRemoved: _removeTileFromBoard,
+      setBlankTileController: _setBlankTileController,
       height: widget.tileHeight,
       width: widget.tileWidth,
     );
@@ -65,7 +68,6 @@ class _BoardGuiState extends State<BoardGui> {
     if (tile != null) {
       widget.board.addTileToPosition(tile, p);
       widget.currentPositions.add(p);
-      print(widget.currentPositions);
     }
   }
 

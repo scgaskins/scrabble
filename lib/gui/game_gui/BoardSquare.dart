@@ -7,11 +7,12 @@ import 'package:scrabble/gui/game_gui/DraggableTile.dart';
 import 'package:scrabble/gui/game_gui/TileTarget.dart';
 
 class BoardSquare extends StatefulWidget {
-  BoardSquare({Key? key, required this.position, required this.onTileReceived, required this.onTileRemoved, this.width, this.height,}): super(key: key);
+  BoardSquare({Key? key, required this.position, required this.onTileReceived, required this.onTileRemoved, required this.setBlankTileController, this.width, this.height,}): super(key: key);
 
   final Position position;
   final void Function(Tile?, Position) onTileReceived;
   final void Function(Position) onTileRemoved;
+  final TextEditingController setBlankTileController;
   final double? width;
   final double? height;
 
@@ -21,6 +22,7 @@ class BoardSquare extends StatefulWidget {
 
 class _BoardSquareState extends State<BoardSquare> {
   Tile? tile;
+  GlobalKey<FormState> _setBlankTileFormKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
@@ -43,6 +45,8 @@ class _BoardSquareState extends State<BoardSquare> {
   void _receiveTile(Tile? tile) {
     setState(() {
       this.tile = tile;
+      if (this.tile != null && !this.tile!.letterIsLocked)
+        _showSetBlankTileDialog();
       widget.onTileReceived(tile, widget.position);
     });
   }
@@ -77,6 +81,57 @@ class _BoardSquareState extends State<BoardSquare> {
       tile: tile!,
       height: widget.height,
       width: widget.width,
+    );
+  }
+
+
+  void _showSetBlankTileDialog() {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          return SimpleDialog(
+            title: Text("Select a letter for the blank tile"),
+            children: [
+              _blankTileSetForm()
+            ],
+          );
+        });
+  }
+
+  Form _blankTileSetForm() {
+    return Form(
+      key: _setBlankTileFormKey,
+      child: Column(
+        children: [
+          _blankTileSetFormField(),
+          ElevatedButton(
+            child: Text("Submit"),
+            onPressed: () {
+              if (_setBlankTileFormKey.currentState!.validate()) {
+                setState(() {
+                  tile!.setBlankTile(widget.setBlankTileController.text);
+                });
+                Navigator.of(context).pop();
+              }
+            },
+          )
+        ],
+      ),
+    );
+  }
+
+  TextFormField _blankTileSetFormField() {
+    return TextFormField(
+      decoration: InputDecoration(
+        labelText: "Enter a letter",
+        border: OutlineInputBorder(),
+      ),
+      controller: widget.setBlankTileController,
+      validator: (String? value) {
+        if (value == null || value.length != 1 || !value.toUpperCase().contains(RegExp("[A-Z]")))
+          return "Please enter a single letter";
+      },
     );
   }
 }

@@ -19,6 +19,8 @@ class Tile {
 
   bool get isLocked => _isLocked;
 
+  bool get letterIsLocked => _letterIsLocked;
+
   void _setScore() {
     if (tileScores.containsKey(_letter)) {
       _score = tileScores[_letter]!;

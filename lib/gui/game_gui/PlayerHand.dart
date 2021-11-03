@@ -40,6 +40,8 @@ class _PlayerHandState extends State<PlayerHand> {
         gui: _emptySquareGui(),
         onTileReceived: (Tile? tile) {
           setState(() {
+            if (tile!= null)
+              tile.resetBlankTile();
             widget.playerHand[index] = tile;
           });
         }

@@ -13,17 +13,18 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
+  List<Tile?> playersHand = [
+    Tile("A"),
+    Tile("B"),
+    Tile("C"),
+    Tile("D"),
+    Tile("E"),
+    null,
+    Tile(" ")
+  ];
+
   @override
   Widget build(BuildContext context) {
-    List<Tile?> playersHand = [
-      Tile("A"),
-      Tile("B"),
-      Tile("C"),
-      Tile("D"),
-      Tile("E"),
-      null,
-      Tile("F")
-    ];
     PlayerHand handGUI = PlayerHand(
       playerHand: playersHand,
       tileWidth: (MediaQuery.of(context).size.width-20) / 15,
@@ -39,13 +40,14 @@ class _GamePageState extends State<GamePage> {
       tileWidth: (MediaQuery.of(context).size.width-20) / 15,
     );
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Game Preview"),
-      ),
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          title: Text("Game Preview"),
+        ),
         body: Center(
           child: Column(
             children: [
-             boardGui,
+              boardGui,
               handGUI
             ],
           ),
