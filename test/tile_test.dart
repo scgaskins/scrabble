@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'dart:convert';
-import 'package:scrabble/game/Tile.dart';
-import 'package:scrabble/game/TileScores.dart';
+import 'package:scrabble/game/classes/Tile.dart';
+import 'package:scrabble/game/game_data/TileScores.dart';
 
 void main() {
   test("Lowercase letters should be converted to upper case", () {

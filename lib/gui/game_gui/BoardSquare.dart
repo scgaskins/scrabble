@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:scrabble/utility/Position.dart';
-import 'package:scrabble/game/Tile.dart';
+import 'package:scrabble/game/classes/Tile.dart';
 import 'package:scrabble/gui/game_gui/BoardSquareGui.dart';
 import 'package:scrabble/gui/game_gui/TileGui.dart';
 import 'package:scrabble/gui/game_gui/DraggableTile.dart';
 import 'package:scrabble/gui/game_gui/TileTarget.dart';
 
 class BoardSquare extends StatefulWidget {
-  BoardSquare({Key? key, required this.position, required this.onTileReceived, required this.onTileRemoved, required this.setBlankTileController, this.width, this.height,}): super(key: key);
+  BoardSquare({Key? key,
+    required this.position,
+    required this.onTileReceived,
+    required this.onTileRemoved,
+    required this.setBlankTileController,
+    this.width,
+    this.height,
+  }): super(key: key);
 
   final Position position;
   final void Function(Tile?, Position) onTileReceived;

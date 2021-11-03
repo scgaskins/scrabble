@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:scrabble/game/Tile.dart';
+import 'Tile.dart';
 
 class TileBag {
   Map<String, int> _initialDistribution = {

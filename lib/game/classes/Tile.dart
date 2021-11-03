@@ -1,4 +1,4 @@
-import 'package:scrabble/game/TileScores.dart';
+import 'package:scrabble/game/game_data/TileScores.dart';
 
 class Tile {
   String _letter;

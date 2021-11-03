@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import 'package:scrabble/game/Tile.dart';
+import 'package:scrabble/game/classes/Tile.dart';
 import 'package:scrabble/gui/game_gui/TileGui.dart';
 
 class DraggableTile extends StatelessWidget {

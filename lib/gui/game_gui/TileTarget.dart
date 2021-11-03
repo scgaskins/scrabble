@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:scrabble/game/Tile.dart';
+import 'package:scrabble/game/classes/Tile.dart';
 
 class TileTarget extends StatelessWidget {
   TileTarget({Key? key, required this.gui, required this.onTileReceived}): super(key: key);

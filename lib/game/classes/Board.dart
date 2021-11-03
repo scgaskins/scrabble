@@ -1,7 +1,7 @@
 import 'package:scrabble/utility/Direction.dart';
 import 'package:scrabble/utility/Position.dart';
-import 'package:scrabble/game/Tile.dart';
-import 'package:scrabble/game/PremiumSquares.dart';
+import 'Tile.dart';
+import 'package:scrabble/game/game_data/PremiumSquares.dart';
 import 'package:scrabble/utility/Pair.dart';
 
 class Board {

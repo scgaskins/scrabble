@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:scrabble/game/TileBag.dart';
-import 'package:scrabble/game/Tile.dart';
+import 'package:scrabble/game/classes/TileBag.dart';
+import 'package:scrabble/game/classes/Tile.dart';
 
 main() {
   final Map<String, int> initialDistribution = {

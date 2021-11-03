@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:scrabble/game/Tile.dart';
+import 'package:scrabble/game/classes/Tile.dart';
 import 'package:scrabble/gui/game_gui/TileTarget.dart';
 import 'package:scrabble/gui/game_gui/DraggableTile.dart';
 

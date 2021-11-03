@@ -1,5 +1,5 @@
 import "package:flutter/material.dart";
-import 'package:scrabble/game/Tile.dart';
+import 'package:scrabble/game/classes/Tile.dart';
 
 class TileGui extends StatelessWidget {
   TileGui({Key? key, required this.tile, this.height, this.width}): super(key: key);

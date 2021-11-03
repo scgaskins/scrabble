@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:scrabble/game/Board.dart';
-import 'package:scrabble/game/Tile.dart';
+import 'package:scrabble/game/classes/Board.dart';
+import 'package:scrabble/game/classes/Tile.dart';
 import 'package:scrabble/utility/Position.dart';
 import 'package:scrabble/gui/game_gui/BoardSquare.dart';
 
 class BoardGui extends StatefulWidget {
-  BoardGui({Key? key, required this.board, required this.currentPositions, required this.boardSize, this.tileWidth, this.tileHeight}): super(key: key);
+  BoardGui({Key? key,
+    required this.board,
+    required this.currentPositions,
+    required this.boardSize,
+    this.tileWidth,
+    this.tileHeight
+  }): super(key: key);
 
   final Board board;
   final List<Position> currentPositions;

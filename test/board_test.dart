@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:scrabble/game/Board.dart';
+import 'package:scrabble/game/classes/Board.dart';
 import 'package:scrabble/utility/Position.dart';
-import 'package:scrabble/game/Tile.dart';
+import 'package:scrabble/game/classes/Tile.dart';
 import 'package:scrabble/utility/Pair.dart';
 
 main() {

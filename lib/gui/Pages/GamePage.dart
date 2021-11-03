@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:scrabble/gui/game_gui/BoardGui.dart';
 import 'package:scrabble/gui/game_gui/PlayerHand.dart';
 import 'package:scrabble/utility/Position.dart';
-import 'package:scrabble/game/Tile.dart';
-import 'package:scrabble/game/Board.dart';
+import 'package:scrabble/game/classes/Tile.dart';
+import 'package:scrabble/game/classes/Board.dart';
 
 class GamePage extends StatefulWidget {
   GamePage({Key? key}): super(key: key);

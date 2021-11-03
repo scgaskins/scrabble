@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:scrabble/utility/Position.dart';
-import 'package:scrabble/game/PremiumSquares.dart';
+import 'package:scrabble/game/game_data/PremiumSquares.dart';
 
 class BoardSquareGui extends StatelessWidget {
   BoardSquareGui({Key? key, required this.position, this.height, this.width}): super(key: key);
