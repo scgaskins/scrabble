@@ -102,6 +102,8 @@ class Board {
   // A valid play requires that the new tiles placed on the board
   // are part of a continuous line that runs horizontally or diagonally
   bool positionsConnectedToEachOther(List<Position> positionList) {
+    if (positionList.length == 1)
+      return true;
     if (positionsAreInALine(positionList)) {
       List<Position> fullListToEnd;
       if (_positionListRunsInDirection(positionList, Direction.north, Direction.south))
@@ -183,7 +185,7 @@ class Board {
     int tripleWord = 0;
     for (Position pos in wordPositions) {
       Tile tile = getTileAtPosition(pos)!;
-      word += tile.letter.toLowerCase();
+      word += tile.letter;
       score += _calculateTileScore(pos, tile);
       if (!tile.isLocked) { // Premium letter squares only apply to newly placed tiles
         if (doubleWordSquares.contains(pos))
