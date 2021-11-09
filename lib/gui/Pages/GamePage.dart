@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:scrabble/gui/game_gui/BoardGui.dart';
 import 'package:scrabble/gui/game_gui/PlayerHand.dart';
+import 'package:scrabble/gui/game_gui/TileSwapGui.dart';
 import 'package:scrabble/utility/Position.dart';
 import 'package:scrabble/utility/Pair.dart';
 import 'package:scrabble/game/classes/Tile.dart';
-import 'package:scrabble/game/classes/Board.dart';
 import 'package:scrabble/game/classes/Game.dart';
 import 'package:scrabble/gui/GeneralUtilities.dart';
 
 class GamePage extends StatefulWidget {
   GamePage({Key? key}): super(key: key);
+
+  final int boardSize = 15;
 
   @override
   State<StatefulWidget> createState() => _GamePageState();
@@ -33,20 +35,23 @@ class _GamePageState extends State<GamePage> {
             children: [
               _boardGui(),
               _playerHandGui(),
-              _submitButton()
+              _submitButton(),
+              _passButton(),
+              _swapTilesButton()
             ],
           ),
         )
     );
   }
 
-  double _tileSize() => (MediaQuery.of(context).size.width-20) / 15;
+  double _tileSize() =>
+      (MediaQuery.of(context).size.width-20) / widget.boardSize;
 
   BoardGui _boardGui() {
     return BoardGui(
       board: game.board,
       currentPositions: currentPositions,
-      boardSize: 15,
+      boardSize: widget.boardSize,
       tileWidth: _tileSize(),
       tileHeight: _tileSize(),
     );
@@ -64,6 +69,20 @@ class _GamePageState extends State<GamePage> {
     return ElevatedButton(
         onPressed: _tryToSubmitPlay,
         child: Text("Submit")
+    );
+  }
+
+  ElevatedButton _passButton() {
+    return ElevatedButton(
+        onPressed: _passTurn,
+        child: Text("Pass")
+    );
+  }
+
+  ElevatedButton _swapTilesButton() {
+    return ElevatedButton(
+        onPressed: _showTileSwapDialog,
+        child: Text("Swap")
     );
   }
   
@@ -130,5 +149,34 @@ class _GamePageState extends State<GamePage> {
     for (Pair<String, int> pair in wordsAndScores)
       wordAndScoreString += "\n${pair.a}: ${pair.b}";
     _showStatusAlert("Successful Play", "You played: $wordAndScoreString");
+  }
+
+  void _passTurn() {
+    setState(() {
+      game.returnTiles(currentPositions);
+      currentPositions = [];
+    });
+  }
+
+  void _showTileSwapDialog() {
+    setState(() => game.returnTiles(currentPositions));
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return TileSwapGui(
+              playerHand: _playerHandGui(),
+              onTilesSubmitted: (List<Tile?> tiles) {
+                Navigator.of(context).pop();
+                _swapTiles(tiles);
+              }
+          );
+        }
+        );
+  }
+
+  void _swapTiles(List<Tile?> tilesToSwap) {
+    setState(() {
+      game.swapTiles(tilesToSwap);
+    });
   }
 }

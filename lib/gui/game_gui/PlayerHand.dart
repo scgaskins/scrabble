@@ -18,6 +18,8 @@ class _PlayerHandState extends State<PlayerHand> {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: _squaresOfHand(),
     );
   }

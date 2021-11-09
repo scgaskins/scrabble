@@ -45,4 +45,25 @@ class Game {
     board.lockTiles(tilePositions);
     fillUserHand();
   }
+
+  void returnTiles(List<Position> tilePositions) {
+    for (Position p in tilePositions) {
+      Tile? tile = board.removeTileFromPosition(p);
+      for (int i=0;i<userHand.length;i++) {
+        if (userHand[i] == null) {
+          userHand[i] = tile;
+          break;
+        }
+      }
+    }
+  }
+
+  void swapTiles(List<Tile?> tilesToSwap) {
+    for (Tile? tile in tilesToSwap) {
+      if (tile != null)
+        _tileBag.addTileToBag(tile);
+    }
+    fillUserHand();
+    print(_tileBag.tileCount);
+  }
 }

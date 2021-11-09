@@ -33,6 +33,8 @@ class _BoardGuiState extends State<BoardGui> {
 
   Column _generateBoardSquares() {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: _generateBoardRows(),
     );
   }
@@ -47,6 +49,8 @@ class _BoardGuiState extends State<BoardGui> {
 
   Row _generateRow(int rowIndex) {
     return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: _generateAllSquaresInRow(rowIndex),
     );
   }

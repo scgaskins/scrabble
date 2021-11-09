@@ -53,6 +53,7 @@ class TileBag {
     throw Exception("There aren't any $letter tiles in the bag");
   }
 
+  // Does not work when bag is empty
   String _getRandomLetter() {
     int randInt = _rng.nextInt(_tileCount);
     for (String letter in _lettersRemaining.keys) {
