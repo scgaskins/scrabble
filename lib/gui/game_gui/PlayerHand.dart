@@ -1,20 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:scrabble/game/classes/Tile.dart';
-import 'package:scrabble/gui/game_gui/TileTarget.dart';
-import 'package:scrabble/gui/game_gui/DraggableTile.dart';
+import 'package:scrabble/gui/game_gui/HandSquare.dart';
 
-class PlayerHand extends StatefulWidget {
+class PlayerHand extends StatelessWidget {
   PlayerHand({Key? key, required this.playerHand, this.tileWidth, this.tileHeight}): super(key: key);
 
   final List<Tile?> playerHand;
   final double? tileWidth;
   final double? tileHeight;
 
-  @override
-  State<StatefulWidget> createState() => _PlayerHandState();
-}
-
-class _PlayerHandState extends State<PlayerHand> {
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -26,49 +20,18 @@ class _PlayerHandState extends State<PlayerHand> {
 
   List<Widget> _squaresOfHand() {
     List<Widget> squares = [];
-    for (int i=0; i<widget.playerHand.length; i++) {
-      Tile? tile = widget.playerHand[i];
-      if (tile == null) {
-        squares.add(_emptySquare(i));
-      } else {
-        squares.add(_draggableTile(tile, i));
-      }
+    for (int i=0; i<playerHand.length; i++) {
+      squares.add(_handSquare(i));
     }
     return squares;
   }
 
-  TileTarget _emptySquare(int index) {
-    return TileTarget(
-        gui: _emptySquareGui(),
-        onTileReceived: (Tile? tile) {
-          setState(() {
-            if (tile!= null)
-              tile.resetBlankTile();
-            widget.playerHand[index] = tile;
-          });
-        }
-    );
-  }
-
-  Container _emptySquareGui() {
-    return Container(
-      width: widget.tileWidth,
-      height: widget.tileHeight,
-      color: Colors.grey,
-    );
-  }
-
-  DraggableTile _draggableTile(Tile tile, int index) {
-    return DraggableTile(
-      width: widget.tileWidth,
-      height: widget.tileHeight,
-      tile: tile,
-      childWhenDragging: _emptySquareGui(),
-      onDragCompleted: () {
-        setState(() {
-          widget.playerHand[index] = null;
-        });
-      },
+  HandSquare _handSquare(int index) {
+    return HandSquare(
+        tileWidth: tileWidth,
+        tileHeight: tileHeight,
+        playerHand: playerHand,
+        index: index
     );
   }
 }

@@ -159,7 +159,10 @@ class _GamePageState extends State<GamePage> {
   }
 
   void _showTileSwapDialog() {
-    setState(() => game.returnTiles(currentPositions));
+    setState(() {
+      game.returnTiles(currentPositions);
+      currentPositions = [];
+    });
     showDialog(
         context: context,
         builder: (BuildContext context) {
