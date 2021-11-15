@@ -36,5 +36,7 @@ void main() {
     Tile decodedTile = Tile.fromJson(tileMap);
     expect(decodedTile.letter, originalTile.letter);
     expect(decodedTile.score, originalTile.score);
+    expect(decodedTile.isLocked, originalTile.isLocked);
+    expect(decodedTile.letterIsLocked, originalTile.letterIsLocked);
   });
 }

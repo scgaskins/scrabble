@@ -3,6 +3,7 @@ import 'package:scrabble/game/classes/Board.dart';
 import 'package:scrabble/utility/Position.dart';
 import 'package:scrabble/game/classes/Tile.dart';
 import 'package:scrabble/utility/Pair.dart';
+import 'dart:convert';
 
 main() {
   test("Printing test", () {
@@ -165,6 +166,28 @@ main() {
     List<Position> newPositions = [Position(7, 11), Position(7, 12), Position(7, 13), Position(7, 14)];
     List<Pair<String, int>> expectedWordsAndScores = [Pair("slapdash", 48)];
     wordsAndScoresTest(newTiles, newPositions, expectedWordsAndScores);
+  });
+  test("Converting to JSON", () {
+    Board b = generateBoard({
+      Position(7, 7): Tile("s"),
+      Position(7, 8): Tile('h'),
+      Position(7, 9): Tile('o'),
+      Position(7, 10): Tile('p')
+    });
+    b = addTilesToBoard(b, {
+      Position(7, 11): Tile('p'),
+      Position(7, 12): Tile("e"),
+      Position(7, 13): Tile("r"),
+      Position(7, 14): blankTileWithLetter("s")
+    });
+    print(b);
+    JsonCodec encoder = new JsonCodec();
+    String jsonString = encoder.encode(b);
+    print(jsonString);
+    Map<String, dynamic> boardMap = encoder.decode(jsonString);
+    Board decodedBoard = Board.fromJson(boardMap);
+    print(decodedBoard);
+    expect(b, decodedBoard);
   });
 }
 

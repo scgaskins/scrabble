@@ -52,16 +52,14 @@ class _BoardSquareState extends State<BoardSquare> {
   }
 
   void _receiveTile(Tile? tile) {
-    setState(() {
-      print(tile);
-      if (tile != null) {
+    if (tile != null) {
+      setState(() {
         widget.board.addTileToPosition(tile, widget.position);
         if (!_tile!.letterIsLocked)
           _showSetBlankTileDialog();
         widget.currentPositions.add(widget.position);
-        print(widget.board);
-      }
-    });
+      });
+    }
   }
 
   BoardSquareGui _boardSquareGui() {

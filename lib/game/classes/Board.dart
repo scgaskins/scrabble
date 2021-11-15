@@ -3,14 +3,18 @@ import 'package:scrabble/utility/Position.dart';
 import 'Tile.dart';
 import 'package:scrabble/game/game_data/PremiumSquares.dart';
 import 'package:scrabble/utility/Pair.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'Board.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class Board {
   final int boardSize = 15;
   final Position centerSquare = Position(7, 7);
-  late List<List<Tile?>> _board;
+  late List<List<Tile?>> board;
 
   Board() {
-    _board = List.generate(boardSize, (index) {
+    board = List.generate(boardSize, (index) {
       List<Tile?> column = List.filled(boardSize, null);
       return column;
     });
@@ -18,13 +22,13 @@ class Board {
 
   Tile? getTileAtPosition(Position p) {
     if (isPositionOnBoard(p)) {
-      return _board[p.column][p.row];
+      return board[p.column][p.row];
     }
     if (p.column >= boardSize || p.column < 0) {
-      throw IndexError(p.column, _board);
+      throw IndexError(p.column, board);
     }
     else if (p.row >= boardSize || p.row < 0) {
-      throw IndexError(p.row, _board[p.column]);
+      throw IndexError(p.row, board[p.column]);
     }
   }
 
@@ -39,7 +43,7 @@ class Board {
 
   void addTileToPosition(Tile tile, Position p) {
     if (!isPositionOccupied(p)) {
-      _board[p.column][p.row] = tile;
+      board[p.column][p.row] = tile;
     }
   }
 
@@ -47,7 +51,7 @@ class Board {
     Tile? tile = getTileAtPosition(p);
     if (tile != null) {
       if (!tile.isLocked) {
-        _board[p.column][p.row] = null;
+        board[p.column][p.row] = null;
         tile.resetBlankTile();
       } else throw Exception("The tile at $p is locked in place");
     }
@@ -231,7 +235,7 @@ class Board {
   }
 
   String _positionToString(int col, int row) {
-    Tile? tile = _board[col][row];
+    Tile? tile = board[col][row];
     if (tile != null) {
       if (tile.score == 0) {
         return tile.letter.toLowerCase();
@@ -242,4 +246,26 @@ class Board {
       return "*";
     }
   }
+
+  factory Board.fromJson(Map<String, dynamic> json) => _$BoardFromJson(json);
+
+  Map<String, dynamic> toJson() => _$BoardToJson(this);
+
+  @override
+  bool operator ==(Object other) {
+    if (other is Board) {
+      for (int col=0; col<boardSize; col++) {
+        for (int row=0;row<boardSize; row++) {
+          if (board[col][row] != other.board[col][row])
+            return false;
+        }
+      }
+      return true;
+    }
+    return false;
+  }
+
+  @override
+  int get hashCode => toJson().toString().hashCode;
+
 }

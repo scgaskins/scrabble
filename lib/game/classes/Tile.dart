@@ -1,13 +1,13 @@
 import 'package:scrabble/game/game_data/TileScores.dart';
 
 class Tile {
-  String _letter;
+  late String _letter;
   late int _score;
   late bool _isLocked;
   late bool _letterIsLocked; // Blank tiles do not have a set letter until played
 
-  Tile(this._letter) {
-    _letter = _letter.toUpperCase();
+  Tile(letter) {
+    _letter = letter.toUpperCase();
     _letterIsLocked = _letter != " ";
     _isLocked = false;
     _setScore();
@@ -46,18 +46,18 @@ class Tile {
     _letterIsLocked = true;
   }
 
-  // Tiles created from Json represent tiles played by other users
-  // on other devices in a multiplayer game.
   Tile.fromJson(Map<String, dynamic> json)
       : _letter = json["letter"],
         _score = json["score"],
-        _isLocked = true,
-        _letterIsLocked = true; // All blank tiles on the board have set letters
+        _letterIsLocked = json["letterIsLocked"],
+        _isLocked = json["isLocked"];
 
   Map<String, dynamic> toJson() {
     return {
-      "letter" : _letter,
-      "score"  : _score
+      "letter"        : _letter,
+      "score"         : _score,
+      "letterIsLocked": _letterIsLocked,
+      "isLocked"      : _isLocked
     };
   }
 
@@ -68,4 +68,14 @@ class Tile {
     }
     return "($_letter: 0$_score)";
   }
+
+  @override
+  bool operator ==(Object other) => other is Tile
+      && other.letter == _letter
+      && other.score == _score
+      && other.letterIsLocked == _letterIsLocked
+      && other.isLocked == _isLocked;
+
+  @override
+  int get hashCode => toJson().toString().hashCode;
 }
