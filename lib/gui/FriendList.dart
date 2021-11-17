@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import "package:cloud_firestore/cloud_firestore.dart";
 import 'package:scrabble/networking/FriendAccess.dart';
+import 'package:scrabble/networking/User.dart';
 
 class FriendList extends StatefulWidget{
   FriendList({Key? key, required this.friendAccess}): super(key: key);
@@ -40,7 +41,7 @@ class _FriendListState extends State<FriendList> {
     if (doc.docs.isNotEmpty) {
       return doc.docs.map((DocumentSnapshot document) {
         return _FriendTile(
-          friendData: widget.friendAccess.getFriendData(document.id),
+          friend: widget.friendAccess.getFriendData(document.id),
         );
       }).toList();
     } else {
@@ -52,9 +53,9 @@ class _FriendListState extends State<FriendList> {
 }
 
 class _FriendTile extends StatefulWidget{
-  _FriendTile({Key? key, required this.friendData}): super(key: key);
+  _FriendTile({Key? key, required this.friend}): super(key: key);
 
-  final Future<Map<String, dynamic>> friendData;
+  final Future<User> friend;
 
   @override
   State<StatefulWidget> createState() => _FriendTileState();
@@ -64,8 +65,8 @@ class _FriendTileState extends State<_FriendTile> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: widget.friendData,
-        builder: (BuildContext context, AsyncSnapshot<Map<String, dynamic>> snapshot) {
+        future: widget.friend,
+        builder: (BuildContext context, AsyncSnapshot<User> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return ListTile(
               title: Text("Loading")
@@ -76,8 +77,8 @@ class _FriendTileState extends State<_FriendTile> {
             );
           }
           return ListTile(
-            title: Text(snapshot.data!["username"]),
-            subtitle: Text(snapshot.data!["email"]),
+            title: Text(snapshot.data!.username),
+            subtitle: Text(snapshot.data!.email),
           );
         }
     );

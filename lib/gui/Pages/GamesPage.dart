@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:scrabble/networking/GameListAccess.dart';
 
 class GamesPage extends StatefulWidget {
+  GamesPage({Key? key, required this.gameListAccess}): super(key: key);
+
+  final GameListAccess gameListAccess;
+
   @override
   State<StatefulWidget> createState() => _GamesPageState();
 }

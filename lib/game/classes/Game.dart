@@ -1,27 +1,37 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'Tile.dart';
 import 'Board.dart';
 import 'TileBag.dart';
+import 'Player.dart';
 import 'package:scrabble/game/game_data/ValidWords.dart';
 import 'package:scrabble/utility/Position.dart';
 import 'package:scrabble/utility/Pair.dart';
+import 'dart:convert';
 
 class Game {
   late Board board;
   late TileBag _tileBag;
-  late List<Tile?> userHand;
+  late int currentTurn;
+  late List<String> playerUids;
+  late Player user;
+  late Timestamp? lastPlay; // The time when the game was last uploaded to Firebase
 
-  Game() {
+  Game(this.playerUids) {
     board = Board();
     _tileBag = TileBag();
-    userHand = List.filled(7, null);
-    fillUserHand();
+  }
+
+  String get currentPlayer => playerUids[currentTurn];
+
+  void fillPlayerHand(Player player) {
+    for (int i=0;i<user.hand.length;i++) {
+      if (user.hand[i] == null)
+        user.hand[i] = _tileBag.drawTile();
+    }
   }
 
   void fillUserHand() {
-    for (int i=0;i<userHand.length;i++) {
-      if (userHand[i] == null)
-        userHand[i] = _tileBag.drawTile();
-    }
+    fillPlayerHand(user);
   }
 
   bool positionsConnectedToBoard(List<Position> positionList) =>
@@ -49,9 +59,9 @@ class Game {
   void returnTiles(List<Position> tilePositions) {
     for (Position p in tilePositions) {
       Tile? tile = board.removeTileFromPosition(p);
-      for (int i=0;i<userHand.length;i++) {
-        if (userHand[i] == null) {
-          userHand[i] = tile;
+      for (int i=0;i<user.hand.length;i++) {
+        if (user.hand[i] == null) {
+          user.hand[i] = tile;
           break;
         }
       }
@@ -66,4 +76,21 @@ class Game {
     fillUserHand();
     print(_tileBag.tileCount);
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "board"      : JsonCodec().encode(board),
+      "tileBag"    : _tileBag,
+      "currentTurn": currentTurn,
+      "playerUids" : playerUids,
+      "lastPlay"   : lastPlay
+    };
+  }
+
+  Game.fromJson(Map<String, dynamic> json)
+      : board       = Board.fromJson(JsonCodec().decode(json["board"])),
+        _tileBag    = TileBag.fromJson(json["tileBag"]),
+        currentTurn = json["currentTurn"],
+        playerUids  = json["playerUids"],
+        lastPlay    = json["lastPlay"];
 }

@@ -1,4 +1,5 @@
 import "package:cloud_firestore/cloud_firestore.dart";
+import 'package:scrabble/networking/User.dart';
 
 class FriendAccess {
   FirebaseFirestore _database;
@@ -52,8 +53,9 @@ class FriendAccess {
     return _users.doc(uid).collection("friends");
   }
 
-  Future<Map<String, dynamic>> getFriendData(String friendUid) async {
+  Future<User> getFriendData(String friendUid) async {
     DocumentSnapshot friendSnap = await _users.doc(friendUid).get();
-    return friendSnap.data() as Map<String, dynamic>;
+    Map<String, dynamic> friendData = friendSnap.data() as Map<String, dynamic>;
+    return User.fromJson(friendData);
   }
 }

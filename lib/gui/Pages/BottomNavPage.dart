@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:scrabble/networking/Authentication.dart';
 import 'package:scrabble/networking/FriendAccess.dart';
+import 'package:scrabble/networking/GameListAccess.dart';
 import 'FriendsPage.dart';
 import 'ProfilePage.dart';
 import 'GamesPage.dart';
@@ -21,12 +22,24 @@ class _BottomNavPageState extends State<BottomNavPage> {
   Widget build(BuildContext context) {
     _tabs = [
       Consumer<Authentication>(
-          builder: (context, authState, _) => ProfilePage(signOut: authState.signOut, userName: authState.displayName,)
+          builder: (context, authState, _) =>
+              ProfilePage(
+                signOut: authState.signOut,
+                userName: authState.displayName,
+              )
       ),
       Consumer<Authentication>(
-          builder: (context, authState, _) => FriendsPage(friendAccess: FriendAccess(_database, authState.userId!),)
+          builder: (context, authState, _) =>
+              FriendsPage(
+                friendAccess: FriendAccess(_database, authState.userId!),
+              )
       ),
-      GamesPage(),
+      Consumer<Authentication>(
+          builder: (context, authState, _) =>
+              GamesPage(
+                gameListAccess: GameListAccess(_database, authState.userId!),
+              )
+      ),
     ];
 
     return Scaffold(

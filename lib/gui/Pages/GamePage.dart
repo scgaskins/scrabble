@@ -3,6 +3,7 @@ import 'package:scrabble/gui/game_gui/BoardGui.dart';
 import 'package:scrabble/gui/game_gui/PlayerHand.dart';
 import 'package:scrabble/gui/game_gui/TileSwapGui.dart';
 import 'package:scrabble/utility/Position.dart';
+import 'package:scrabble/game/classes/Player.dart';
 import 'package:scrabble/utility/Pair.dart';
 import 'package:scrabble/game/classes/Tile.dart';
 import 'package:scrabble/game/classes/Game.dart';
@@ -18,11 +19,13 @@ class GamePage extends StatefulWidget {
 }
 
 class _GamePageState extends State<GamePage> {
-  Game game = Game();
+  Game game = Game([]);
+  Player user = Player(0, List.filled(7, null));
   List<Position> currentPositions = [];
 
   @override
   Widget build(BuildContext context) {
+    game.user = user;
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
@@ -59,7 +62,7 @@ class _GamePageState extends State<GamePage> {
 
   PlayerHand _playerHandGui() {
     return PlayerHand(
-      playerHand: game.userHand,
+      playerHand: game.user.hand,
       tileHeight: _tileSize(),
       tileWidth: _tileSize(),
     );
