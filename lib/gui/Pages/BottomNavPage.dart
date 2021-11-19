@@ -37,6 +37,8 @@ class _BottomNavPageState extends State<BottomNavPage> {
       Consumer<Authentication>(
           builder: (context, authState, _) =>
               GamesPage(
+                uid: authState.userId!,
+                database: _database,
                 gameListAccess: GameListAccess(_database, authState.userId!),
               )
       ),

@@ -2,6 +2,7 @@ import "package:cloud_firestore/cloud_firestore.dart";
 import 'package:scrabble/game/classes/Game.dart';
 import 'package:scrabble/game/classes/Player.dart';
 import 'package:scrabble/networking/User.dart';
+import 'package:scrabble/utility/Pair.dart';
 
 class GameListAccess {
   FirebaseFirestore _database;
@@ -15,8 +16,17 @@ class GameListAccess {
     _games = _database.collection("games");
     gamesStream = _games
         .where("playerUids", arrayContains: _uid)
-        .orderBy("lastPlay", descending: true)
+        //.orderBy("lastPlay", descending: true)
         .snapshots();
+  }
+
+  Future<Map<String, User>> getOtherUsers(Game game) async {
+    Map<String, User> otherUsers = {};
+    for (String uid in game.playerUids) {
+      if (uid != _uid)
+        otherUsers[uid] = await getUserData(uid);
+    }
+    return otherUsers;
   }
 
   Future<User> getUserData(uid) async {
@@ -30,8 +40,14 @@ class GameListAccess {
     return Game.fromJson(gameData);
   }
 
+  Future<Pair<Game, Map<String, User>>> getGameAndUserData(DocumentSnapshot gameSnapshot) async {
+    Game gameData = await getGameData(gameSnapshot);
+    Map<String, User> uidsToPlayers = await getOtherUsers(gameData);
+    return Pair(gameData, uidsToPlayers);
+  }
+
   Future<void> createGame(List<String> playerUIDs) async {
-    DocumentReference game = await _games.add({});
+    DocumentReference game = await _games.add({"created": true});
     Game gameState = Game(playerUIDs);
     WriteBatch batch = _createPlayers(game, gameState);
     gameState.lastPlay = Timestamp.now();

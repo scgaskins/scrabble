@@ -6,6 +6,7 @@ import 'package:scrabble/gui/Pages/Start.dart';
 import 'package:scrabble/gui/Pages/RegisterPage.dart';
 import 'package:scrabble/gui/Pages/SignInPage.dart';
 import 'package:scrabble/gui/Pages/GamePage.dart';
+import 'package:scrabble/gui/Pages/CreateGamePage.dart';
 
 void main() {
   runApp(App());
@@ -75,7 +76,28 @@ class MyApp extends StatelessWidget {
 
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      routes: {
+      home: Consumer<Authentication>(
+        builder: (context, authState, _) => Start(logInState: authState.logInState),
+      ),
+      onGenerateRoute: (RouteSettings settings) {
+        if (settings.name == "/register") {
+          return MaterialPageRoute(builder: (context) => Consumer<Authentication>(
+            builder: (context, authState, _) => RegisterPage(signUp: authState.registerAccount),
+          ));
+        } else if (settings.name == "/signIn") {
+          return MaterialPageRoute(builder: (context) => Consumer<Authentication>(
+              builder: (context, authState, _) => SignInPage(signIn: authState.signIn)
+          ));
+        } else if (settings.name == "/createGame") {
+          final args = settings.arguments as CreateGamePageArguments;
+          return MaterialPageRoute(builder: (context) => CreateGamePage(
+              uid: args.uid,
+              gameListAccess: args.gameListAccess,
+              friendAccess: args.friendAccess
+          ));
+        }
+      },
+      /*routes: {
         '/': (context) => Consumer<Authentication>(
           builder: (context, authState, _) => Start(logInState: authState.logInState),
         ),
@@ -86,7 +108,7 @@ class MyApp extends StatelessWidget {
           builder: (context, authState, _) => SignInPage(signIn: authState.signIn)
         ),
         "/game": (context) => GamePage(),
-      },
+      },*/
     );
   }
 }

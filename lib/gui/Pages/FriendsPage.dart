@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:scrabble/networking/FriendAccess.dart';
+import 'package:scrabble/networking/User.dart';
 import 'package:scrabble/gui/FriendList.dart';
+import 'package:scrabble/gui/FriendTile.dart';
 import 'package:scrabble/gui/GeneralUtilities.dart';
 
 class FriendsPage extends StatefulWidget {
@@ -18,12 +21,21 @@ class _FriendsPageState extends State<FriendsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: FriendList(friendAccess: widget.friendAccess),
+        body: FriendList(
+          friendAccess: widget.friendAccess,
+          generateChild: generateFriendTile,
+        ),
       floatingActionButton: FloatingActionButton(
         onPressed: showAddFriendDialog,
         tooltip: "Add a friend",
         child: const Icon(Icons.add),
       ),
+    );
+  }
+
+  FriendTile generateFriendTile(DocumentSnapshot friendDoc) {
+    return FriendTile(
+        friend: widget.friendAccess.getFriendData(friendDoc.id)
     );
   }
 

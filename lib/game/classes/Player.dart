@@ -13,7 +13,7 @@ class Player {
         if (t != null)
           return t.letter; // All tiles with the same letter in a player's hand have the same traits
         return null;
-      })
+      }).toList()
     };
   }
 

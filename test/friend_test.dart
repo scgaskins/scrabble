@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../lib/networking/FriendAccess.dart';
+import 'package:scrabble/networking/FriendAccess.dart';
+import 'package:scrabble/networking/User.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 
@@ -19,12 +20,10 @@ main() {
 }
 
 void makeFakeUser(FakeFirebaseFirestore instance, String uid, String email, String username) async {
+  User user = User(username, email);
   await instance.collection("users")
       .doc(uid)
-      .set({
-        "email": email,
-        "username": username
-      });
+      .set(user.toJson());
 }
 
 Future<bool> userHasFriend(FakeFirebaseFirestore instance, String uid, String friendID) async {

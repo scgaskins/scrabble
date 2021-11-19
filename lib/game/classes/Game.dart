@@ -19,14 +19,15 @@ class Game {
   Game(this.playerUids) {
     board = Board();
     _tileBag = TileBag();
+    currentTurn = 0;
   }
 
   String get currentPlayer => playerUids[currentTurn];
 
   void fillPlayerHand(Player player) {
-    for (int i=0;i<user.hand.length;i++) {
-      if (user.hand[i] == null)
-        user.hand[i] = _tileBag.drawTile();
+    for (int i=0;i<player.hand.length;i++) {
+      if (player.hand[i] == null)
+        player.hand[i] = _tileBag.drawTile();
     }
   }
 
@@ -80,7 +81,7 @@ class Game {
   Map<String, dynamic> toJson() {
     return {
       "board"      : JsonCodec().encode(board),
-      "tileBag"    : _tileBag,
+      "tileBag"    : _tileBag.toJson(),
       "currentTurn": currentTurn,
       "playerUids" : playerUids,
       "lastPlay"   : lastPlay
