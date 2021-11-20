@@ -92,6 +92,8 @@ class Game {
       : board       = Board.fromJson(JsonCodec().decode(json["board"])),
         _tileBag    = TileBag.fromJson(json["tileBag"]),
         currentTurn = json["currentTurn"],
-        playerUids  = json["playerUids"],
+        playerUids  = (json["playerUids"] as List<dynamic>)
+            .map((e) => e as String)
+            .toList(),
         lastPlay    = json["lastPlay"];
 }

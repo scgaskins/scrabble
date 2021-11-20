@@ -46,14 +46,15 @@ class GameListAccess {
     return Pair(gameData, uidsToPlayers);
   }
 
-  Future<void> createGame(List<String> playerUIDs) async {
-    DocumentReference game = await _games.add({"created": true});
+  Future<DocumentReference> createGame(List<String> playerUIDs) async {
+    DocumentReference gameDoc = await _games.add({"created": true});
     Game gameState = Game(playerUIDs);
-    WriteBatch batch = _createPlayers(game, gameState);
+    WriteBatch batch = _createPlayers(gameDoc, gameState);
     gameState.lastPlay = Timestamp.now();
     Map<String, dynamic> gameData = gameState.toJson();
-    batch.set(game, gameData);
-    return batch.commit();
+    batch.set(gameDoc, gameData);
+    await batch.commit();
+    return gameDoc;
   }
 
   WriteBatch _createPlayers(DocumentReference gameDoc, Game gameState) {
