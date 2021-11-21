@@ -103,6 +103,7 @@ class _CreateGamePageState extends State<CreateGamePage> {
         context: context,
         builder: (context) => LoadingDialog(
             future: gameFuture,
+            errorWidget: simpleAlert(context, "Something went wrong", "Game could not be created"),
             successWidget: gameCreationAlert()
         )
     );

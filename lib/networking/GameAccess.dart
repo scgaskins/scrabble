@@ -1,28 +1,74 @@
 import "package:cloud_firestore/cloud_firestore.dart";
-import 'package:scrabble/game/classes/Board.dart';
-import 'package:scrabble/game/classes/TileBag.dart';
-import 'package:scrabble/game/classes/Tile.dart';
 import 'package:scrabble/game/classes/Game.dart';
 import 'package:scrabble/game/classes/Player.dart';
+import 'package:scrabble/networking/User.dart';
 
 class GameAccess {
   FirebaseFirestore _database;
   String _gameId;
   String _uid;
   late DocumentReference _gameDoc;
+  late Stream<DocumentSnapshot> gameStream;
   late CollectionReference _playerCollection;
-  late DocumentReference _usersDocument;
+  late DocumentReference _userDocument;
+  late Stream<DocumentSnapshot> userStream;
   late CollectionReference _users;
 
   GameAccess(this._database, this._gameId, this._uid) {
     _gameDoc = _database
         .collection("games")
         .doc(_gameId);
+    gameStream = _gameDoc.snapshots();
     _playerCollection = _gameDoc
         .collection("players");
-    _usersDocument = _playerCollection
+    _userDocument = _playerCollection
         .doc(_uid);
+    userStream = _userDocument.snapshots();
     _users = _database
         .collection("users");
+  }
+
+  Game getGameStateFromSnapshot(DocumentSnapshot gameSnap) {
+    Map<String, dynamic> gameData = gameSnap.data()! as Map<String, dynamic>;
+    Game game = Game.fromJson(gameData);
+    return game;
+  }
+
+  Future<Game> getGameStateAsync() async {
+    DocumentSnapshot gameSnap = await _gameDoc.get();
+    return getGameStateFromSnapshot(gameSnap);
+  }
+
+  Player getPlayerStateFromSnapshot(DocumentSnapshot playerSnap) {
+    Map<String, dynamic> userData = playerSnap.data()! as Map<String, dynamic>;
+    return Player.fromJson(_uid, userData);
+  }
+
+  Future<Player> getPlayerStateAsync() async {
+    DocumentSnapshot userSnap = await _userDocument.get();
+    return getPlayerStateFromSnapshot(userSnap);
+  }
+
+  Future<void> updateState(Game gameState) async {
+    gameState.lastPlay = Timestamp.now();
+    WriteBatch batch = _database.batch();
+    batch.set(_gameDoc, gameState.toJson());
+    batch.set(_userDocument, gameState.user.toJson());
+    return batch.commit();
+  }
+
+  Future<User> getUserInfo(String uid) async {
+    DocumentSnapshot userInfo = await _users.doc(uid).get();
+    Map<String, dynamic> userData = userInfo.data()! as Map<String, dynamic>;
+    return User.fromJson(userData);
+  }
+
+  Future<Map<String, User>> getOtherUsers(Game game) async {
+    Map<String, User> otherUsers = {};
+    for (String uid in game.playerUids) {
+      if (uid != _uid)
+        otherUsers[uid] = await getUserInfo(uid);
+    }
+    return otherUsers;
   }
 }

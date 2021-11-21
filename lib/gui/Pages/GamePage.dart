@@ -1,188 +1,118 @@
 import 'package:flutter/material.dart';
-import 'package:scrabble/gui/game_gui/BoardGui.dart';
-import 'package:scrabble/gui/game_gui/PlayerHand.dart';
-import 'package:scrabble/gui/game_gui/TileSwapGui.dart';
-import 'package:scrabble/utility/Position.dart';
-import 'package:scrabble/game/classes/Player.dart';
-import 'package:scrabble/utility/Pair.dart';
-import 'package:scrabble/game/classes/Tile.dart';
-import 'package:scrabble/game/classes/Game.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:scrabble/networking/GameAccess.dart';
 import 'package:scrabble/gui/GeneralUtilities.dart';
+import 'package:scrabble/gui/game_gui/GameGui.dart';
+import 'package:scrabble/game/classes/Game.dart';
+import 'package:scrabble/gui/LoadingDialog.dart';
+
+class GamePageArguments {
+  final GameAccess gameAccess;
+
+  GamePageArguments(this.gameAccess);
+}
 
 class GamePage extends StatefulWidget {
-  GamePage({Key? key}): super(key: key);
+  GamePage({Key? key, required this.gameAccess}): super(key: key);
 
-  final int boardSize = 15;
+  final GameAccess gameAccess;
 
   @override
   State<StatefulWidget> createState() => _GamePageState();
 }
 
 class _GamePageState extends State<GamePage> {
-  Game game = Game([]);
-  Player user = Player(0, List.filled(7, null));
-  List<Position> currentPositions = [];
-
   @override
   Widget build(BuildContext context) {
-    game.user = user;
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: Text("Game Preview"),
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _boardGui(),
-              _playerHandGui(),
-              _submitButton(),
-              _passButton(),
-              _swapTilesButton()
-            ],
-          ),
+      body: StreamBuilder(
+        stream: widget.gameAccess.gameStream,
+        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> gameSnap) {
+          if (gameSnap.hasData) {
+            return StreamBuilder(
+                stream: widget.gameAccess.userStream,
+                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> userSnap) {
+                  if (gameSnap.hasError) {
+                    return Text('Something went wrong');
+                  }
+
+                  if (gameSnap.connectionState == ConnectionState.waiting) {
+                    return const Center(child: SizedBox(
+                      width: 60,
+                      height: 80,
+                      child: CircularProgressIndicator(),
+                    ));
+                  }
+
+                  Game game = widget.gameAccess.getGameStateFromSnapshot(gameSnap.data!);
+                  game.user = widget.gameAccess.getPlayerStateFromSnapshot(userSnap.data!);
+                  return GameGui(
+                    game: game,
+                    pushGameStateToFirebase: updateFirebase,
+                  );
+                }
+            );
+
+          }
+
+          if (gameSnap.connectionState == ConnectionState.waiting) {
+            return const Center(child: SizedBox(
+              width: 60,
+              height: 80,
+              child: CircularProgressIndicator(),
+            ));
+          }
+
+          return Text('Something went wrong');
+        },
+      ),
+    );
+  }
+
+  void updateFirebase(Game gameState) {
+    gameState.endTurn();
+    Future pushFuture = widget.gameAccess.updateState(gameState);
+    showDialog(context: context, barrierDismissible: false, builder: (BuildContext context) {
+      return LoadingDialog(
+        future: pushFuture,
+        successWidget: successfulPushDialog(),
+        errorWidget: failedPushDialog(),
+      );
+    });
+  }
+
+  AlertDialog failedPushDialog() {
+    return AlertDialog(
+      title: Text("Could Not Submit Turn"),
+      content: Text("Try again later"),
+      actions: [
+        SimpleDialogOption(
+          child: Text("OK"),
+          onPressed: () {
+            Navigator.of(context).pop();
+            setState(() {});
+          },
         )
+      ],
     );
   }
 
-  double _tileSize() =>
-      (MediaQuery.of(context).size.width-20) / widget.boardSize;
-
-  BoardGui _boardGui() {
-    return BoardGui(
-      board: game.board,
-      currentPositions: currentPositions,
-      boardSize: widget.boardSize,
-      tileWidth: _tileSize(),
-      tileHeight: _tileSize(),
+  AlertDialog successfulPushDialog() {
+    return AlertDialog(
+      title: Text("Turn Submitted Successfully"),
+      actions: [
+        SimpleDialogOption(
+          child: Text("OK"),
+          onPressed: () {
+            Navigator.of(context).pop();
+            setState(() {});
+          },
+        )
+      ],
     );
-  }
-
-  PlayerHand _playerHandGui() {
-    return PlayerHand(
-      playerHand: game.user.hand,
-      tileHeight: _tileSize(),
-      tileWidth: _tileSize(),
-    );
-  }
-
-  ElevatedButton _submitButton() {
-    return ElevatedButton(
-        onPressed: _tryToSubmitPlay,
-        child: Text("Submit")
-    );
-  }
-
-  ElevatedButton _passButton() {
-    return ElevatedButton(
-        onPressed: _passTurn,
-        child: Text("Pass")
-    );
-  }
-
-  ElevatedButton _swapTilesButton() {
-    return ElevatedButton(
-        onPressed: _showTileSwapDialog,
-        child: Text("Swap")
-    );
-  }
-  
-  void _tryToSubmitPlay() {
-    currentPositions.sort();
-    if (_checkPositions()) {
-      List<Pair<String, int>> wordsAndScores = game.getWordsAndScoresOffList(currentPositions);
-      if (_checkWords(wordsAndScores.map((p) => p.a).toList()))
-        _submitWordsAndScores(wordsAndScores);
-    }
-  }
-
-  void _submitWordsAndScores(List<Pair<String, int>> wordsAndScores) {
-    setState(() {
-      game.submitPlay(wordsAndScores, currentPositions);
-      currentPositions = [];
-      _successfulPlayAlert(wordsAndScores);
-    });
-  }
-
-  bool _checkPositions() {
-    if (currentPositions.isEmpty) {
-      _invalidPlayAlert("You need to use at least one tile");
-      return false;
-    } else if (!game.positionsConnectedToBoard(currentPositions)) {
-      _invalidPlayAlert("Tiles must play off another word or the center square");
-      return false;
-    } else if (!game.positionsConnectedToEachOther(currentPositions)) {
-      _invalidPlayAlert("Tiles must be in a continuous line");
-      return false;
-    }
-    return true;
-  }
-
-  bool _checkWords(List<String> words) {
-    List<String> invalidWords = game.findInvalidWords(words);
-    if (invalidWords.isNotEmpty) {
-      _invalidPlayAlert("These words are not valid: ${_invalidWordString(invalidWords)}");
-      return false;
-    }
-    return true;
-  }
-
-  String _invalidWordString(List<String> invalidWords) {
-    String invalidWordString = "";
-    for (String word in invalidWords)
-      invalidWordString += "\n" + word;
-    return invalidWordString;
-  }
-
-  void _showStatusAlert(String playStatus, content) {
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-         return simpleAlert(context, playStatus, content);
-        });
-  }
-
-  void _invalidPlayAlert(String message) =>
-      _showStatusAlert("Invalid Play", message);
-
-  void _successfulPlayAlert(List<Pair<String, int>> wordsAndScores) {
-    String wordAndScoreString = "";
-    for (Pair<String, int> pair in wordsAndScores)
-      wordAndScoreString += "\n${pair.a}: ${pair.b}";
-    _showStatusAlert("Successful Play", "You played: $wordAndScoreString");
-  }
-
-  void _passTurn() {
-    setState(() {
-      game.returnTiles(currentPositions);
-      currentPositions = [];
-    });
-  }
-
-  void _showTileSwapDialog() {
-    setState(() {
-      game.returnTiles(currentPositions);
-      currentPositions = [];
-    });
-    showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return TileSwapGui(
-              playerHand: _playerHandGui(),
-              onTilesSubmitted: (List<Tile?> tiles) {
-                Navigator.of(context).pop();
-                _swapTiles(tiles);
-              }
-          );
-        }
-        );
-  }
-
-  void _swapTiles(List<Tile?> tilesToSwap) {
-    setState(() {
-      game.swapTiles(tilesToSwap);
-    });
   }
 }

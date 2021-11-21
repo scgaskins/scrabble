@@ -5,15 +5,15 @@ import 'package:scrabble/networking/User.dart';
 import 'package:scrabble/utility/Pair.dart';
 
 class GameListAccess {
-  FirebaseFirestore _database;
+  FirebaseFirestore database;
   String _uid;
   late CollectionReference _games;
   late CollectionReference _users;
   late Stream<QuerySnapshot> gamesStream;
   
-  GameListAccess(this._database, this._uid) {
-    _users = _database.collection("users");
-    _games = _database.collection("games");
+  GameListAccess(this.database, this._uid) {
+    _users = database.collection("users");
+    _games = database.collection("games");
     gamesStream = _games
         .where("playerUids", arrayContains: _uid)
         //.orderBy("lastPlay", descending: true)
@@ -58,10 +58,10 @@ class GameListAccess {
   }
 
   WriteBatch _createPlayers(DocumentReference gameDoc, Game gameState) {
-    WriteBatch batch = _database.batch();
+    WriteBatch batch = database.batch();
     CollectionReference playerCollection = gameDoc.collection("players");
     for (String uid in gameState.playerUids) {
-      Player playerState = Player(0, List.filled(7, null));
+      Player playerState = Player(uid, List.filled(7, null));
       gameState.fillPlayerHand(playerState);
       batch.set(playerCollection.doc(uid), playerState.toJson());
     }

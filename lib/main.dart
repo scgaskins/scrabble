@@ -95,8 +95,13 @@ class MyApp extends StatelessWidget {
               gameListAccess: args.gameListAccess,
               friendAccess: args.friendAccess
           ));
+        } else if (settings.name == "/game") {
+          final args = settings.arguments as GamePageArguments;
+          return MaterialPageRoute(builder: (context) => GamePage(
+            gameAccess: args.gameAccess,
+          ));
         }
-      },
+        },
       /*routes: {
         '/': (context) => Consumer<Authentication>(
           builder: (context, authState, _) => Start(logInState: authState.logInState),

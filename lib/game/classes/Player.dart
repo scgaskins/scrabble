@@ -1,14 +1,13 @@
 import 'package:scrabble/game/classes/Tile.dart';
 
 class Player {
-  int score;
+  String uid;
   List<Tile?> hand;
 
-  Player(this.score, this.hand);
+  Player(this.uid, this.hand);
 
   Map<String, dynamic> toJson() {
     return {
-      "score": score,
       "hand": hand.map((Tile? t) {
         if (t != null)
           return t.letter; // All tiles with the same letter in a player's hand have the same traits
@@ -17,9 +16,8 @@ class Player {
     };
   }
 
-  Player.fromJson(Map<String, dynamic> json)
-      : score = json["score"],
-        hand = (json["hand"] as List<dynamic>).map((item) {
+  Player.fromJson(this.uid, Map<String, dynamic> json)
+      : hand = (json["hand"] as List<dynamic>).map((item) {
           if (item != null)
             return Tile(item);
           return null;

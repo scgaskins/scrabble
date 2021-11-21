@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:scrabble/gui/GeneralUtilities.dart';
 
 class LoadingDialog extends StatelessWidget {
-  LoadingDialog({Key? key, required this.future, required this.successWidget}): super(key: key);
+  LoadingDialog({Key? key, required this.future, required this.successWidget, required this.errorWidget}): super(key: key);
 
   final Future future;
   final Widget successWidget;
+  final Widget errorWidget;
 
   @override
   Widget build(BuildContext context) {

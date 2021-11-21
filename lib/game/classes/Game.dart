@@ -13,16 +13,25 @@ class Game {
   late TileBag _tileBag;
   late int currentTurn;
   late List<String> playerUids;
+  late Map<String, int> playerScores;
   late Player user;
+  late bool gameOver;
   late Timestamp? lastPlay; // The time when the game was last uploaded to Firebase
 
   Game(this.playerUids) {
     board = Board();
     _tileBag = TileBag();
     currentTurn = 0;
+    gameOver = false;
+    playerScores = Map
+        .fromIterables(
+        playerUids,
+        List.filled(playerUids.length, 0)
+    );
   }
 
   String get currentPlayer => playerUids[currentTurn];
+  bool get isUsersTurn => currentPlayer == user.uid;
 
   void fillPlayerHand(Player player) {
     for (int i=0;i<player.hand.length;i++) {
@@ -52,9 +61,23 @@ class Game {
     return invalidWords;
   }
 
+  void endTurn() {
+    currentTurn = (currentTurn + 1) % playerUids.length;
+  }
+
   void submitPlay(List<Pair<String, int>> wordsAndScores, List<Position> tilePositions) {
     board.lockTiles(tilePositions);
+    updateScores(List
+        .from(wordsAndScores
+        .map((Pair wordAndScore) => wordAndScore.b))
+    );
     fillUserHand();
+  }
+
+  void updateScores(List<int> scores) {
+    for (int score in scores) {
+      playerScores[currentPlayer] = playerScores[currentPlayer]! + score;
+    }
   }
 
   void returnTiles(List<Position> tilePositions) {
@@ -80,20 +103,24 @@ class Game {
 
   Map<String, dynamic> toJson() {
     return {
-      "board"      : JsonCodec().encode(board),
-      "tileBag"    : _tileBag.toJson(),
-      "currentTurn": currentTurn,
-      "playerUids" : playerUids,
-      "lastPlay"   : lastPlay
+      "board"       : JsonCodec().encode(board),
+      "tileBag"     : _tileBag.toJson(),
+      "currentTurn" : currentTurn,
+      "playerUids"  : playerUids,
+      "playerScores": playerScores,
+      "gameOver"    : gameOver,
+      "lastPlay"    : lastPlay
     };
   }
 
   Game.fromJson(Map<String, dynamic> json)
-      : board       = Board.fromJson(JsonCodec().decode(json["board"])),
-        _tileBag    = TileBag.fromJson(json["tileBag"]),
-        currentTurn = json["currentTurn"],
-        playerUids  = (json["playerUids"] as List<dynamic>)
+      : board        = Board.fromJson(JsonCodec().decode(json["board"])),
+        _tileBag     = TileBag.fromJson(json["tileBag"]),
+        currentTurn  = json["currentTurn"],
+        playerUids   = (json["playerUids"] as List<dynamic>)
             .map((e) => e as String)
             .toList(),
-        lastPlay    = json["lastPlay"];
+        playerScores = Map<String, int>.from(json['playerScores'] as Map),
+        gameOver = json["gameOver"],
+        lastPlay     = json["lastPlay"];
 }

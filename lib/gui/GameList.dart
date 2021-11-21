@@ -2,9 +2,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:scrabble/networking/GameListAccess.dart';
+import 'package:scrabble/networking/GameAccess.dart';
 import 'package:scrabble/networking/User.dart';
 import 'package:scrabble/game/classes/Game.dart';
 import 'package:scrabble/utility/Pair.dart';
+import 'package:scrabble/gui/Pages/GamePage.dart';
 
 class GameList extends StatefulWidget{
   GameList({Key? key, required this.gameListAccess, required this.uid}): super(key: key);
@@ -111,7 +113,13 @@ class _GameCard extends StatelessWidget {
             children: [
               TextButton(
                 child: Text("To Game"),
-                onPressed: () {},
+                onPressed:() {
+                  Navigator.pushNamed(context, "/game",
+                      arguments: GamePageArguments(
+                          GameAccess(gameListAccess.database, gameId, uid)
+                      )
+                  );
+                },
               )
             ],
           )
