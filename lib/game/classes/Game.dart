@@ -13,7 +13,7 @@ class Game {
   late TileBag _tileBag;
   late int currentTurn;
   late List<String> playerUids;
-  late Map<String, int> playerScores;
+  late Map<String, int> _playerScores;
   late Player user;
   late bool gameOver;
   late Timestamp? lastPlay; // The time when the game was last uploaded to Firebase
@@ -23,7 +23,7 @@ class Game {
     _tileBag = TileBag();
     currentTurn = 0;
     gameOver = false;
-    playerScores = Map
+    _playerScores = Map
         .fromIterables(
         playerUids,
         List.filled(playerUids.length, 0)
@@ -32,6 +32,9 @@ class Game {
 
   String get currentPlayer => playerUids[currentTurn];
   bool get isUsersTurn => currentPlayer == user.uid;
+  int get usersScore => _playerScores[user.uid]!;
+
+  int scoreForPlayer(String playerUid) => _playerScores[playerUid]!;
 
   void fillPlayerHand(Player player) {
     for (int i=0;i<player.hand.length;i++) {
@@ -76,7 +79,7 @@ class Game {
 
   void updateScores(List<int> scores) {
     for (int score in scores) {
-      playerScores[currentPlayer] = playerScores[currentPlayer]! + score;
+      _playerScores[currentPlayer] = _playerScores[currentPlayer]! + score;
     }
   }
 
@@ -107,7 +110,7 @@ class Game {
       "tileBag"     : _tileBag.toJson(),
       "currentTurn" : currentTurn,
       "playerUids"  : playerUids,
-      "playerScores": playerScores,
+      "playerScores": _playerScores,
       "gameOver"    : gameOver,
       "lastPlay"    : lastPlay
     };
@@ -120,7 +123,7 @@ class Game {
         playerUids   = (json["playerUids"] as List<dynamic>)
             .map((e) => e as String)
             .toList(),
-        playerScores = Map<String, int>.from(json['playerScores'] as Map),
+        _playerScores = Map<String, int>.from(json['playerScores'] as Map),
         gameOver     = json["gameOver"],
         lastPlay     = json["lastPlay"];
 }
