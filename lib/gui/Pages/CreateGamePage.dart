@@ -97,7 +97,7 @@ class _CreateGamePageState extends State<CreateGamePage> {
 
   void startGame() async {
     selectedFriendUIDS.insert(0, widget.uid);
-    Future<void> gameFuture = widget.gameListAccess.createGame(selectedFriendUIDS);
+    Future gameFuture = widget.gameListAccess.createGame(selectedFriendUIDS);
     showDialog(
       barrierDismissible: false,
         context: context,

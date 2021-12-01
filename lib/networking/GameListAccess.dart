@@ -35,13 +35,13 @@ class GameListAccess {
     return User.fromJson(userData);
   }
 
-  Future<Game> getGameData(DocumentSnapshot gameSnapshot) async {
+  Game getGameDataFromSnapshot(DocumentSnapshot gameSnapshot) {
     Map<String, dynamic> gameData = gameSnapshot.data() as Map<String, dynamic>;
     return Game.fromJson(gameData);
   }
 
   Future<Pair<Game, Map<String, User>>> getGameAndUserData(DocumentSnapshot gameSnapshot) async {
-    Game gameData = await getGameData(gameSnapshot);
+    Game gameData = getGameDataFromSnapshot(gameSnapshot);
     Map<String, User> uidsToPlayers = await getOtherUsers(gameData);
     return Pair(gameData, uidsToPlayers);
   }

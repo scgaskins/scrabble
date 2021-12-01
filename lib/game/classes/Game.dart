@@ -121,6 +121,6 @@ class Game {
             .map((e) => e as String)
             .toList(),
         playerScores = Map<String, int>.from(json['playerScores'] as Map),
-        gameOver = json["gameOver"],
+        gameOver     = json["gameOver"],
         lastPlay     = json["lastPlay"];
 }

@@ -2,30 +2,37 @@ import "package:cloud_firestore/cloud_firestore.dart";
 import 'package:scrabble/game/classes/Game.dart';
 import 'package:scrabble/game/classes/Player.dart';
 import 'package:scrabble/networking/User.dart';
+import 'package:scrabble/utility/Pair.dart';
+import 'dart:async';
+import 'package:stream_transform/stream_transform.dart';
 
 class GameAccess {
   FirebaseFirestore _database;
   String _gameId;
   String _uid;
   late DocumentReference _gameDoc;
-  late Stream<DocumentSnapshot> gameStream;
+  late Stream<DocumentSnapshot> _gameStream;
   late CollectionReference _playerCollection;
   late DocumentReference _userDocument;
-  late Stream<DocumentSnapshot> userStream;
+  late Stream<DocumentSnapshot> _userStream;
   late CollectionReference _users;
+  late Stream<Pair<DocumentSnapshot, DocumentSnapshot>> gameAndUserStream;
 
   GameAccess(this._database, this._gameId, this._uid) {
     _gameDoc = _database
         .collection("games")
         .doc(_gameId);
-    gameStream = _gameDoc.snapshots();
+    _gameStream = _gameDoc.snapshots();
     _playerCollection = _gameDoc
         .collection("players");
     _userDocument = _playerCollection
         .doc(_uid);
-    userStream = _userDocument.snapshots();
+    _userStream = _userDocument.snapshots();
     _users = _database
         .collection("users");
+    gameAndUserStream =  _gameStream.combineLatest(_userStream,
+            (DocumentSnapshot gameData, DocumentSnapshot userData) => Pair(gameData, userData)
+    );
   }
 
   Game getGameStateFromSnapshot(DocumentSnapshot gameSnap) {

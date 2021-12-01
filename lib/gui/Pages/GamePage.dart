@@ -5,6 +5,7 @@ import 'package:scrabble/gui/GeneralUtilities.dart';
 import 'package:scrabble/gui/game_gui/GameGui.dart';
 import 'package:scrabble/game/classes/Game.dart';
 import 'package:scrabble/gui/LoadingDialog.dart';
+import 'package:scrabble/utility/Pair.dart';
 
 class GamePageArguments {
   final GameAccess gameAccess;
@@ -30,36 +31,20 @@ class _GamePageState extends State<GamePage> {
           title: Text("Game Preview"),
         ),
       body: StreamBuilder(
-        stream: widget.gameAccess.gameStream,
-        builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> gameSnap) {
-          if (gameSnap.hasData) {
-            return StreamBuilder(
-                stream: widget.gameAccess.userStream,
-                builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> userSnap) {
-                  if (gameSnap.hasError) {
-                    return Text('Something went wrong');
-                  }
-
-                  if (gameSnap.connectionState == ConnectionState.waiting) {
-                    return const Center(child: SizedBox(
-                      width: 60,
-                      height: 80,
-                      child: CircularProgressIndicator(),
-                    ));
-                  }
-
-                  Game game = widget.gameAccess.getGameStateFromSnapshot(gameSnap.data!);
-                  game.user = widget.gameAccess.getPlayerStateFromSnapshot(userSnap.data!);
-                  return GameGui(
-                    game: game,
-                    pushGameStateToFirebase: updateFirebase,
-                  );
-                }
+        stream: widget.gameAccess.gameAndUserStream,
+        builder: (BuildContext context, AsyncSnapshot<Pair<DocumentSnapshot, DocumentSnapshot>> gameAndUserSnap) {
+          if (gameAndUserSnap.hasData) {
+            DocumentSnapshot gameSnap = gameAndUserSnap.data!.a;
+            DocumentSnapshot userSnap = gameAndUserSnap.data!.b;
+            Game game = widget.gameAccess.getGameStateFromSnapshot(gameSnap);
+            game.user = widget.gameAccess.getPlayerStateFromSnapshot(userSnap);
+            return GameGui(
+              game: game,
+              pushGameStateToFirebase: updateFirebase,
             );
-
           }
 
-          if (gameSnap.connectionState == ConnectionState.waiting) {
+          if (gameAndUserSnap.connectionState == ConnectionState.waiting) {
             return const Center(child: SizedBox(
               width: 60,
               height: 80,
