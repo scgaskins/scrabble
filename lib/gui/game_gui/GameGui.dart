@@ -7,13 +7,15 @@ import 'package:scrabble/utility/Pair.dart';
 import 'package:scrabble/game/classes/Tile.dart';
 import 'package:scrabble/game/classes/Game.dart';
 import 'package:scrabble/gui/GeneralUtilities.dart';
+import 'package:scrabble/networking/User.dart';
 
 class GameGui extends StatefulWidget {
-  GameGui({Key? key, required this.game, required this.pushGameStateToFirebase}): super(key: key);
+  GameGui({Key? key, required this.game, required this.pushGameStateToFirebase, required this.uidsToPlayers}): super(key: key);
 
   final int boardSize = 15;
   final Game game;
   final Function(Game) pushGameStateToFirebase;
+  final Map<String, User> uidsToPlayers;
 
   @override
   State<StatefulWidget> createState() => _GameGuiState();
@@ -21,6 +23,16 @@ class GameGui extends StatefulWidget {
 
 class _GameGuiState extends State<GameGui> {
   List<Position> currentPositions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.game.gameOver) {
+      WidgetsBinding.instance!.addPostFrameCallback((_) async {
+        await _showGameOverDialogue();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,44 +49,46 @@ class _GameGuiState extends State<GameGui> {
     );
   }
 
-  double _tileSize() =>
+  double get _tileSize =>
       (MediaQuery.of(context).size.width) / widget.boardSize;
+
+  bool get _canPlay => widget.game.isUsersTurn && !widget.game.gameOver;
 
   BoardGui _boardGui() {
     return BoardGui(
       board: widget.game.board,
       currentPositions: currentPositions,
       boardSize: widget.boardSize,
-      tileWidth: _tileSize(),
-      tileHeight: _tileSize(),
+      tileWidth: _tileSize,
+      tileHeight: _tileSize,
     );
   }
 
   PlayerHand _playerHandGui() {
     return PlayerHand(
       playerHand: widget.game.user.hand,
-      tileHeight: _tileSize(),
-      tileWidth: _tileSize(),
+      tileHeight: _tileSize,
+      tileWidth: _tileSize,
     );
   }
 
   ElevatedButton _submitButton() {
     return ElevatedButton(
-        onPressed: widget.game.isUsersTurn ? _tryToSubmitPlay : () {},
+        onPressed: _canPlay ? _tryToSubmitPlay : null,
         child: Text("Submit")
     );
   }
 
   ElevatedButton _passButton() {
     return ElevatedButton(
-        onPressed: widget.game.isUsersTurn ? _passTurn : () {},
+        onPressed: _canPlay ? _passTurn : null,
         child: Text("Pass")
     );
   }
 
   ElevatedButton _swapTilesButton() {
     return ElevatedButton(
-        onPressed: widget.game.isUsersTurn ? _showTileSwapDialog : () {},
+        onPressed: _canPlay ? _showTileSwapDialog : null,
         child: Text("Swap")
     );
   }
@@ -177,5 +191,25 @@ class _GameGuiState extends State<GameGui> {
       widget.game.swapTiles(tilesToSwap);
       widget.pushGameStateToFirebase(widget.game);
     });
+  }
+
+  Future<void> _showGameOverDialogue() async {
+    return showDialog(
+        context: context,
+        builder: (BuildContext context) => simpleAlert(context, "Game Over", _gameOverMessage())
+    );
+  }
+
+  String _gameOverMessage() {
+    String winnerUid = widget.game.highestScoringPlayerUid();
+    int winningScore = widget.game.scoreForPlayer(winnerUid);
+    String winnerName = _usernameOfUid(winnerUid);
+    return "$winnerName won with $winningScore points.";
+  }
+
+  String _usernameOfUid(String uid) {
+    if (uid == widget.game.user.uid)
+      return "You";
+    return widget.uidsToPlayers[uid]!.username;
   }
 }

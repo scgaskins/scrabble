@@ -6,17 +6,20 @@ import 'package:scrabble/gui/game_gui/ScoreListDrawer.dart';
 import 'package:scrabble/game/classes/Game.dart';
 import 'package:scrabble/gui/LoadingDialog.dart';
 import 'package:scrabble/utility/Pair.dart';
+import 'package:scrabble/networking/User.dart';
 
 class GamePageArguments {
   final GameAccess gameAccess;
+  final Map<String, User> uidsToPlayers;
 
-  GamePageArguments(this.gameAccess);
+  GamePageArguments(this.gameAccess, this.uidsToPlayers);
 }
 
 class GamePage extends StatefulWidget {
-  GamePage({Key? key, required this.gameAccess}): super(key: key);
+  GamePage({Key? key, required this.gameAccess, required this.uidsToPlayers}): super(key: key);
 
   final GameAccess gameAccess;
+  final Map<String, User> uidsToPlayers;
 
   @override
   State<StatefulWidget> createState() => _GamePageState();
@@ -44,10 +47,11 @@ class _GamePageState extends State<GamePage> {
               ),
               endDrawer: ScoreListDrawer(
                 game: game,
-                gameAccess: widget.gameAccess,
+                uidsToPlayers: widget.uidsToPlayers,
               ),
               body: GameGui(
                 game: game,
+                uidsToPlayers: widget.uidsToPlayers,
                 pushGameStateToFirebase: updateFirebase,
               ),
             );

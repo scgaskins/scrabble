@@ -99,6 +99,7 @@ class MyApp extends StatelessWidget {
           final args = settings.arguments as GamePageArguments;
           return MaterialPageRoute(builder: (context) => GamePage(
             gameAccess: args.gameAccess,
+            uidsToPlayers: args.uidsToPlayers,
           ));
         }
         },

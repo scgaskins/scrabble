@@ -36,6 +36,18 @@ class Game {
 
   int scoreForPlayer(String playerUid) => _playerScores[playerUid]!;
 
+  String highestScoringPlayerUid() {
+    int highestScore = -1;
+    late String highestScoringPlayer;
+    for (String uid in _playerScores.keys) {
+      if (scoreForPlayer(uid) > highestScore) {
+        highestScore = scoreForPlayer(uid);
+        highestScoringPlayer = uid;
+      }
+    }
+    return highestScoringPlayer;
+  }
+
   void fillPlayerHand(Player player) {
     for (int i=0;i<player.hand.length;i++) {
       if (player.hand[i] == null)
@@ -65,6 +77,7 @@ class Game {
   }
 
   void endTurn() {
+    checkIfGameOver();
     currentTurn = (currentTurn + 1) % playerUids.length;
   }
 
@@ -102,6 +115,11 @@ class Game {
     }
     fillUserHand();
     print(_tileBag.tileCount);
+  }
+
+  void checkIfGameOver() {
+    if (_tileBag.isEmpty() && user.handIsEmpty)
+      gameOver = true;
   }
 
   Map<String, dynamic> toJson() {

@@ -106,7 +106,7 @@ class _GameCard extends StatelessWidget {
         children: [
           ListTile(
             title: Text('Game with: ${_playerUsernamesString()}'),
-            subtitle: Text("${_currentPlayer()} Turn"),
+            subtitle: _subTitle(),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
@@ -116,7 +116,8 @@ class _GameCard extends StatelessWidget {
                 onPressed:() {
                   Navigator.pushNamed(context, "/game",
                       arguments: GamePageArguments(
-                          GameAccess(gameListAccess.database, gameId, uid)
+                          GameAccess(gameListAccess.database, gameId, uid),
+                          uidsToPlayers
                       )
                   );
                 },
@@ -126,6 +127,12 @@ class _GameCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Text _subTitle() {
+    if (game.gameOver)
+      return Text("This game is over");
+    return Text("${_currentPlayer()} Turn");
   }
 
   String _playerUsernamesString() {

@@ -6,6 +6,14 @@ class Player {
 
   Player(this.uid, this.hand);
 
+  bool get handIsEmpty {
+    for (Tile? tile in hand) {
+      if (tile != null)
+        return false;
+    }
+    return true;
+  }
+
   Map<String, dynamic> toJson() {
     return {
       "hand": hand.map((Tile? t) {
