@@ -70,17 +70,21 @@ class _CreateGamePageState extends State<CreateGamePage> {
             return ListTile(title: Text("Loading"),);
           } else if (snapshot.hasData) {
             User friend = snapshot.data!;
-            return CheckboxListTile(
-              title: Text(friend.username),
-                subtitle: Text(friend.email),
-                value: isFriendSelected(friendDoc),
-                onChanged: (_) {
-                  selectOrUnselectFriend(friendDoc);
-                }
-            );
+            return friendSelectBox(friendDoc, friend);
           } else {
             return ListTile(title: Text("Could not load this friend"),);
           }
+        }
+    );
+  }
+
+  CheckboxListTile friendSelectBox(DocumentSnapshot friendDoc, User friend) {
+    return CheckboxListTile(
+        title: Text(friend.username),
+        subtitle: Text(friend.email),
+        value: isFriendSelected(friendDoc),
+        onChanged: (_) {
+          selectOrUnselectFriend(friendDoc);
         }
     );
   }
@@ -98,8 +102,15 @@ class _CreateGamePageState extends State<CreateGamePage> {
   void startGame() async {
     selectedFriendUIDS.insert(0, widget.uid);
     Future gameFuture = widget.gameListAccess.createGame(selectedFriendUIDS);
+    showLoadingDialog(gameFuture);
+    setState(() {
+      selectedFriendUIDS = [];
+    });
+  }
+
+  void showLoadingDialog(Future gameFuture) {
     showDialog(
-      barrierDismissible: false,
+        barrierDismissible: false,
         context: context,
         builder: (context) => LoadingDialog(
             future: gameFuture,
@@ -107,9 +118,6 @@ class _CreateGamePageState extends State<CreateGamePage> {
             successWidget: gameCreationAlert()
         )
     );
-    setState(() {
-      selectedFriendUIDS = [];
-    });
   }
 
   AlertDialog gameCreationAlert() {

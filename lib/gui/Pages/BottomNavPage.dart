@@ -23,9 +23,10 @@ class _BottomNavPageState extends State<BottomNavPage> {
     _tabs = [
       Consumer<Authentication>(
           builder: (context, authState, _) =>
-              ProfilePage(
-                signOut: authState.signOut,
-                userName: authState.displayName,
+              GamesPage(
+                uid: authState.userId!,
+                database: _database,
+                gameListAccess: GameListAccess(_database, authState.userId!),
               )
       ),
       Consumer<Authentication>(
@@ -36,10 +37,9 @@ class _BottomNavPageState extends State<BottomNavPage> {
       ),
       Consumer<Authentication>(
           builder: (context, authState, _) =>
-              GamesPage(
-                uid: authState.userId!,
-                database: _database,
-                gameListAccess: GameListAccess(_database, authState.userId!),
+              ProfilePage(
+                signOut: authState.signOut,
+                userName: authState.displayName,
               )
       ),
     ];
@@ -52,9 +52,9 @@ class _BottomNavPageState extends State<BottomNavPage> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         items: [
-          _navBarChoice(Icon(Icons.home), "Profile"),
-          _navBarChoice(Icon(Icons.person), "Friends"),
           _navBarChoice(Icon(Icons.menu), "Games"),
+          _navBarChoice(Icon(Icons.person), "Friends"),
+          _navBarChoice(Icon(Icons.face), "Profile"),
         ],
         onTap: (index) {
           setState(() {

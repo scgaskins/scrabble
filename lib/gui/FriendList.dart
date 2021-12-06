@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import "package:cloud_firestore/cloud_firestore.dart";
 import 'package:scrabble/networking/FriendAccess.dart';
-import 'package:scrabble/gui/FriendTile.dart';
 
 class FriendList extends StatefulWidget{
   FriendList({Key? key, required this.friendAccess, required this.generateChild}): super(key: key);

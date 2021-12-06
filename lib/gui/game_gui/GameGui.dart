@@ -14,7 +14,7 @@ class GameGui extends StatefulWidget {
 
   final int boardSize = 15;
   final Game game;
-  final Function(Game) pushGameStateToFirebase;
+  final Future<bool> Function(Game) pushGameStateToFirebase; // returns whether game successfully uploaded
   final Map<String, User> uidsToPlayers;
 
   @override
@@ -28,6 +28,7 @@ class _GameGuiState extends State<GameGui> {
   void initState() {
     super.initState();
     if (widget.game.gameOver) {
+      // From https://stackoverflow.com/questions/50806031/open-flutter-dialog-after-navigation
       WidgetsBinding.instance!.addPostFrameCallback((_) async {
         await _showGameOverDialogue();
       });
@@ -102,13 +103,14 @@ class _GameGuiState extends State<GameGui> {
     }
   }
 
-  void _submitWordsAndScores(List<Pair<String, int>> wordsAndScores) {
+  void _submitWordsAndScores(List<Pair<String, int>> wordsAndScores) async {
     setState(() {
       widget.game.submitPlay(wordsAndScores, currentPositions);
       currentPositions = [];
-      widget.pushGameStateToFirebase(widget.game);
-      _successfulPlayAlert(wordsAndScores);
     });
+    bool successfullyUploaded = await widget.pushGameStateToFirebase(widget.game);
+    if (successfullyUploaded)
+      _successfulPlayAlert(wordsAndScores);
   }
 
   bool _checkPositions() {

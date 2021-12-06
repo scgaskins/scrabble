@@ -82,16 +82,25 @@ class _GamePageState extends State<GamePage> {
     );
   }
 
-  void updateFirebase(Game gameState) {
+  Future<bool> updateFirebase(Game gameState) async {
     gameState.endTurn();
     Future pushFuture = widget.gameAccess.updateState(gameState);
-    showDialog(context: context, barrierDismissible: false, builder: (BuildContext context) {
-      return LoadingDialog(
-        future: pushFuture,
-        successWidget: successfulPushDialog(),
-        errorWidget: failedPushDialog(),
-      );
-    });
+    showLoadingDialog(pushFuture);
+    return pushFuture
+        .then((_) => true) // if the push completes successfully
+        .onError((_, __) => false); // if there is an error
+  }
+
+  void showLoadingDialog(Future uploadFuture) {
+    showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) => LoadingDialog(
+          future: uploadFuture,
+          successWidget: successfulPushDialog(),
+          errorWidget: failedPushDialog(),
+        )
+    );
   }
 
   AlertDialog failedPushDialog() {

@@ -13,15 +13,16 @@ class LoadingDialog extends StatelessWidget {
     return FutureBuilder(
       future: future,
       builder: (BuildContext context, AsyncSnapshot snapShot) {
+        if (snapShot.hasError) {
+          print(snapShot.error!.toString());
+          return errorWidget;
+        }
         if (snapShot.connectionState == ConnectionState.waiting) {
           return const Center(child: SizedBox(
             width: 60,
             height: 80,
             child: CircularProgressIndicator(),
           ));
-        } if (snapShot.hasError) {
-          print(snapShot.error!.toString());
-          return simpleAlert(context, "Something Went Wrong", "Try again later.");
         }
         return successWidget;
       },
