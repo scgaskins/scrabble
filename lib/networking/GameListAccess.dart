@@ -16,7 +16,7 @@ class GameListAccess {
     _games = database.collection("games");
     gamesStream = _games
         .where("playerUids", arrayContains: _uid)
-        //.orderBy("lastPlay", descending: true)
+        .orderBy("lastPlay", descending: true)
         .snapshots();
   }
 
@@ -47,7 +47,7 @@ class GameListAccess {
   }
 
   Future<DocumentReference> createGame(List<String> playerUIDs) async {
-    DocumentReference gameDoc = await _games.add({"created": true});
+    DocumentReference gameDoc = await _games.add({"playerUids": playerUIDs});
     Game gameState = Game(playerUIDs);
     WriteBatch batch = _createPlayers(gameDoc, gameState);
     gameState.lastPlay = Timestamp.now();
