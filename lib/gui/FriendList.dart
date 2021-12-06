@@ -39,9 +39,13 @@ class _FriendListState extends State<FriendList> {
 
   List<Widget> _getChildren(QuerySnapshot doc) {
     if (doc.docs.isNotEmpty) {
-      return doc.docs.map((DocumentSnapshot document) {
+      Iterable<Widget> childList = doc.docs.map((DocumentSnapshot document) {
         return widget.generateChild(document);
-      }).toList();
+      });
+      return ListTile.divideTiles(
+          context: context,
+          color: Colors.black,
+          tiles: childList).toList();
     } else {
       return [ListTile(
         title: Text("You don't seem to have any friends"),
