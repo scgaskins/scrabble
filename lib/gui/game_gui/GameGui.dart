@@ -43,9 +43,7 @@ class _GameGuiState extends State<GameGui> {
       children: [
         _boardGui(),
         _playerHandGui(),
-        _submitButton(),
-        _passButton(),
-        _swapTilesButton()
+        _buttonBar()
       ],
     );
   }
@@ -70,6 +68,17 @@ class _GameGuiState extends State<GameGui> {
       playerHand: widget.game.user.hand,
       tileHeight: _tileSize,
       tileWidth: _tileSize,
+    );
+  }
+
+  Row _buttonBar() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        _passButton(),
+        _submitButton(),
+        _swapTilesButton()
+      ],
     );
   }
 
@@ -111,6 +120,8 @@ class _GameGuiState extends State<GameGui> {
     bool successfullyUploaded = await widget.pushGameStateToFirebase(widget.game);
     if (successfullyUploaded)
       _successfulPlayAlert(wordsAndScores);
+    if (widget.game.gameOver)
+      _showGameOverDialogue();
   }
 
   bool _checkPositions() {
