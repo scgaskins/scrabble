@@ -39,7 +39,7 @@ class _GamePageState extends State<GamePage> {
             return Scaffold(
               resizeToAvoidBottomInset: false,
               appBar: AppBar(
-                title: Text("Game Preview"),
+                title: Text("Scrabble"),
                 leading: IconButton(
                   icon: Icon(Icons.arrow_back),
                   onPressed: () => Navigator.pop(context),
@@ -78,7 +78,7 @@ class _GamePageState extends State<GamePage> {
 
   AppBar appBar() {
     return AppBar(
-        title: Text("Game Preview")
+        title: Text("Scrabble")
     );
   }
 
