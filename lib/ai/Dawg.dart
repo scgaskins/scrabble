@@ -10,6 +10,24 @@ class Dawg {
     _register = [];
   }
 
+  /// The DAWG contains a word if there is a path
+  /// containing all the letters of the word in order
+  /// that ends with a terminal node
+  bool contains(String word) {
+    Node currentNode = _rootNode;
+    for (int i=0; i<word.length; i++) {
+      String c = word[i];
+      Edge? edgeWithC = currentNode.edgeWithLabel(c);
+      if (edgeWithC != null) {
+        if (i == word.length - 1 && edgeWithC.isTerminal)
+          return true;
+        currentNode = edgeWithC.nextNode;
+      } else
+        return false;
+    }
+    return false;
+  }
+
   void addWords(List<String> words) {
     for (String word in words) {
       _addWord(word);
@@ -48,6 +66,10 @@ class Dawg {
     return prefix;
   }
 
+  /// This prunes off identical paths in the DAWG
+  /// If the most recently added child of the input node
+  /// is identical to a node in the register, it is replaced
+  /// with that node, otherwise it is stored in the register
   void _replaceOrRegister(Node state) {
     Node lastChild = state.lastChild;
     if (lastChild.hasChildren())

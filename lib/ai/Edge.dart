@@ -14,5 +14,5 @@ class Edge {
       && other.isTerminal == isTerminal;
 
   @override
-  int get hashCode => label.hashCode + nextNode.hashCode + isTerminal.hashCode;
+  int get hashCode => (1000*label.hashCode) + nextNode.hashCode + isTerminal.hashCode;
 }

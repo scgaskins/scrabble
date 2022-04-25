@@ -18,6 +18,8 @@ class Node {
 
   bool hasChildren() => edges.isNotEmpty;
 
+  /// lastChild is the node at the end of the
+  /// most recently added edge
   Node get lastChild => edges.last.nextNode;
 
   set lastChild(Node n) {
@@ -38,5 +40,5 @@ class Node {
   }
 
   @override
-  int get hashCode => edges.fold(0, (hash, edge) => hash + edge.hashCode);
+  int get hashCode => edges.fold(0, (hash, edge) => hash + (10 * edge.hashCode));
 }
