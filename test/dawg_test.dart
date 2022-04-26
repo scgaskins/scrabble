@@ -24,15 +24,13 @@ main() {
       'ABATER',
       'ABATES',
       'ABATING'];
-    Dawg dawg = new Dawg();
-    dawg.addWords(words);
+    Dawg dawg = new Dawg(words);
     for (String word in words) {
       assert(dawg.contains(word));
     }
   });
   test("All words test", () {
-    Dawg dawg = new Dawg();
-    dawg.addWords(validWords.toList());
+    Dawg dawg = new Dawg(validWords.toList());
     List<String> words = ['ABASE',
       'ABASED',
       'ABASEMENT',

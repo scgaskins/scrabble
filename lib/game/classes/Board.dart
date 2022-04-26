@@ -41,6 +41,9 @@ class Board {
     return tileAtPos != null;
   }
 
+  bool positionOnBoardAndOccupied(Position p) =>
+      isPositionOnBoard(p) && isPositionOccupied(p);
+
   void addTileToPosition(Tile tile, Position p) {
     if (!isPositionOccupied(p)) {
       board[p.column][p.row] = tile;
@@ -56,6 +59,16 @@ class Board {
       } else throw Exception("The tile at $p is locked in place");
     }
     return tile;
+  }
+
+  List<Tile> removeAllTilesFromPos(List<Position> positions) {
+    List<Tile> tiles = [];
+    for (Position pos in positions) {
+      Tile? tile = removeTileFromPosition(pos);
+      if (tile != null)
+        tiles.add(tile);
+    }
+    return tiles;
   }
 
   void lockTiles(List<Position> positionList) {
@@ -136,12 +149,23 @@ class Board {
   }
 
   List<Position> _getWordPositionsOffPosition(Position start, Direction up, Direction down) {
-    List<Position> beginningPositions = _getOccupiedPositionBeforePosInDir(start, up);
+    List<Position> beginningPositions = _getOccupiedPositionsBeforePosInDir(start, up);
     List<Position> endingPositions = _getOccupiedPositionsAfterPosInDir(start, down);
     return beginningPositions + [start] + endingPositions;
   }
 
-  List<Position> _getOccupiedPositionBeforePosInDir(Position start, Direction dir) {
+  String getStringAfterPosInDir(Position start, Direction dir) {
+    List<Position> positionsInDir = dir == Direction.south || dir == Direction.east
+        ? _getOccupiedPositionsAfterPosInDir(start, dir)
+        : _getOccupiedPositionsBeforePosInDir(start, dir);
+    String letters = positionsInDir.fold("", (wordSoFar, p) {
+      Tile tile = getTileAtPosition(p)!;
+      return wordSoFar + tile.letter;
+    });
+    return letters;
+  }
+
+  List<Position> _getOccupiedPositionsBeforePosInDir(Position start, Direction dir) {
     List<Position> positions = [];
     for (Position pos=start.getNeighbor(dir); isPositionOnBoard(pos) && isPositionOccupied(pos); pos=pos.getNeighbor(dir))
       positions.insert(0, pos);
@@ -160,6 +184,22 @@ class Board {
       return _getAllNewWordsAndScores(positionList, Direction.north, Direction.south, Direction.west, Direction.east);
     else
       return _getAllNewWordsAndScores(positionList, Direction.west, Direction.east, Direction.north, Direction.south);
+  }
+
+  List<Position> getAllNewWordPositions(List<Position> positionList) {
+    Direction up, down;
+    if (_positionListRunsInDirection(positionList, Direction.north, Direction.south)) {
+      up = Direction.north;
+      down = Direction.south;
+    } else {
+      up = Direction.west;
+      down = Direction.east;
+    }
+    List<Position> initialWordPositions = _getWordPositionsOffPosition(positionList.first, up, down);
+    Set<Position> wordPositions = Set.from(initialWordPositions);
+    for (Position p in initialWordPositions)
+      wordPositions.addAll(_getWordPositionsOffPosition(p, up, down));
+    return wordPositions.toList();
   }
   
   List<Pair<String, int>> _getAllNewWordsAndScores(List<Position> positionList, Direction up, Direction down, Direction left, Direction right) {

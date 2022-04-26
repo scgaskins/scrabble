@@ -2,19 +2,20 @@ import 'package:scrabble/ai/Edge.dart';
 import 'package:scrabble/ai/Node.dart';
 
 class Dawg {
-  late Node _rootNode;
+  late Node rootNode;
   late List<Node> _register;
 
-  Dawg() {
-    _rootNode = Node([]);
+  Dawg(List<String> words) {
+    rootNode = Node([]);
     _register = [];
+    _addWords(words);
   }
 
   /// The DAWG contains a word if there is a path
   /// containing all the letters of the word in order
   /// that ends with a terminal node
   bool contains(String word) {
-    Node currentNode = _rootNode;
+    Node currentNode = rootNode;
     for (int i=0; i<word.length; i++) {
       String c = word[i];
       Edge? edgeWithC = currentNode.edgeWithLabel(c);
@@ -28,16 +29,34 @@ class Dawg {
     return false;
   }
 
-  void addWords(List<String> words) {
+  /// Checks if there are any words in the DAWG that
+  /// start with prefix
+  bool containsPrefix(String prefix) {
+    Node currentNode = rootNode;
+    for (int i=0; i<prefix.length; i++) {
+      String c = prefix[i];
+      Edge? edgeWithC = currentNode.edgeWithLabel(c);
+      if (edgeWithC != null) {
+        if (i == prefix.length - 1)
+          return true;
+        currentNode = edgeWithC.nextNode;
+      } else
+        return false;
+    }
+    return false;
+  }
+
+  void _addWords(List<String> words) {
     for (String word in words) {
       _addWord(word);
     }
-    _replaceOrRegister(_rootNode);
+    _replaceOrRegister(rootNode);
+    _register.clear();
   }
 
   void _addWord(String word) {
     List<Edge> prefix = _commonPrefix(word);
-    Node lastState = prefix.isNotEmpty ? prefix.last.nextNode : _rootNode;
+    Node lastState = prefix.isNotEmpty ? prefix.last.nextNode : rootNode;
     String currentSuffix = word.substring(prefix.length);
     if (lastState.hasChildren())
       _replaceOrRegister(lastState);
@@ -49,7 +68,7 @@ class Dawg {
   /// the path that spells that prefix.
   List<Edge> _commonPrefix(String word) {
     List<Edge> prefix = [];
-    Node currentNode = _rootNode;
+    Node currentNode = rootNode;
     int currentLetterIndex = 0;
     bool searching = true;
     while (searching) {
