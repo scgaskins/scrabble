@@ -20,6 +20,7 @@ class ComputerPlayer {
   List<Tile> hand;
   List<Tile> _tilesBeingConsidered = [];
   List<Pair<Position, Tile>> _bestMove = [];
+  List<Pair<String, int>> _bestMoveResult = [];
   int _bestScore = 0;
 
   ComputerPlayer(this._wordGraph, this.hand, this.board) {
@@ -56,12 +57,14 @@ class ComputerPlayer {
     hand.add(tile);
   }
 
-  List<Pair<Position, Tile>> makeMove() {
+  List<Pair<String, int>> makeMove() {
     List<Position> downAnchors = getAnchorPositions(Direction.south);
     _genAndEvaluateAllMoves(downAnchors, Direction.south);
     List<Position> acrossAnchors = getAnchorPositions(Direction.east);
     _genAndEvaluateAllMoves(acrossAnchors, Direction.east);
-    return _bestMove;
+    for (Pair<Position, Tile> pair in _bestMove)
+      board.addTileToPosition(pair.b, pair.a);
+    return _bestMoveResult;
   }
 
   void _genAndEvaluateAllMoves(List<Position> anchors, Direction right) {
@@ -112,7 +115,8 @@ class ComputerPlayer {
           _tilesBeingConsidered.add(tile);
           Node nextNode = edge.nextNode;
           Position nextSquare = startPos.getNeighbor(right);
-          _extendRight(partialWord + tile.letter, nextNode, edge.isTerminal, nextSquare, right);
+          if (board.isPositionOnBoard(nextSquare))
+            _extendRight(partialWord + tile.letter, nextNode, edge.isTerminal, nextSquare, right);
           _returnTileToHand(_tilesBeingConsidered.removeLast());
         }
       }
@@ -122,7 +126,8 @@ class ComputerPlayer {
       if (edgeWithLetter != null) {
         Node nextNode = edgeWithLetter.nextNode;
         Position nextPos = startPos.getNeighbor(right);
-        _extendRight(partialWord + letterOnSquare, nextNode, edgeWithLetter.isTerminal, nextPos, right);
+        if (board.isPositionOnBoard(nextPos))
+          _extendRight(partialWord + letterOnSquare, nextNode, edgeWithLetter.isTerminal, nextPos, right);
       }
     }
   }
@@ -133,8 +138,11 @@ class ComputerPlayer {
     Position lastPos = endPos;
     for (Tile tile in _tilesBeingConsidered.reversed) {
       Position posForTile = lastPos.getNeighbor(left);
+      while (board.isPositionOccupied(posForTile))
+        posForTile = posForTile.getNeighbor(left);
       currentMove.insert(0, Pair(posForTile, tile));
       board.addTileToPosition(tile, posForTile);
+      lastPos = posForTile;
     }
     List<Pair<String, int>> wordsAndScores = board.getWordsAndScoresOffList(currentMove.map((pair) => pair.a).toList());
     board.removeAllTilesFromPos(currentMove.map((pair) => pair.a).toList());
@@ -142,6 +150,7 @@ class ComputerPlayer {
     if (totalScore > _bestScore) {
       _bestMove = currentMove;
       _bestScore = totalScore;
+      _bestMoveResult = wordsAndScores;
     }
   }
 
@@ -199,11 +208,9 @@ class ComputerPlayer {
     for (int i=0; i<board.boardSize; i++) {
       Position startPos = left == Direction.north ? Position(i, 0) : Position(0, i);
       for (Position p=startPos; board.isPositionOnBoard(p); p=p.getNeighbor(right)) {
-        Position upNeighbor = p.getNeighbor(up);
         Position downNeighbor = p.getNeighbor(down);
         if (!board.isPositionOccupied(p)) {
-          if (board.positionOnBoardAndOccupied(upNeighbor) ||
-              board.positionOnBoardAndOccupied(downNeighbor))
+          if (board.positionOnBoardAndOccupied(downNeighbor))
             anchors.add(p);
         }
       }

@@ -3,8 +3,10 @@ import 'package:scrabble/ai/Dawg.dart';
 import 'package:scrabble/ai/ComputerPlayer.dart';
 import 'package:scrabble/game/classes/Board.dart';
 import 'package:scrabble/game/classes/Tile.dart';
+import 'package:scrabble/game/game_data/ValidWords.dart';
 import 'package:scrabble/utility/Position.dart';
 import 'package:scrabble/utility/Direction.dart';
+import 'package:scrabble/utility/Pair.dart';
 
 main() {
   test("Anchor positions test", () {
@@ -15,16 +17,38 @@ main() {
       Position(7, 10): Tile('p')
     });
     print(b);
-    ComputerPlayer player = ComputerPlayer(Dawg([]), [], b);
+    ComputerPlayer player = ComputerPlayer(Dawg(["ajklaf", "bjlkaj", "cjlaewl"]), [], b);
     List<Position> downAnchors = player.getAnchorPositions(Direction.south);
     print(downAnchors);
-    testLists(downAnchors, [Position(7, 6), Position(7, 11)]);
+    testLists(downAnchors, [Position(7, 6)]);
     List<Position> acrossAnchors = player.getAnchorPositions(Direction.east);
     print(acrossAnchors);
     testLists(acrossAnchors, [
-      Position(6, 7), Position(8, 7), Position(6, 8), Position(8, 8),
-      Position(6, 9), Position(8, 9), Position(6, 10), Position(8, 10)
+      Position(6, 7), Position(6, 8),
+      Position(6, 9), Position(6, 10),
     ]);
+  });
+  test("Move generation test", () {
+    Board b = generateBoard({
+      Position(7, 7): Tile("s"),
+      Position(7, 8): Tile('h'),
+      Position(7, 9): Tile('o'),
+      Position(7, 10): Tile('p')
+    });
+    print(b);
+    Dawg dawg = Dawg(validWords.toList());
+    print("Dawg constructed");
+    List<Tile> hand = [
+      Tile("C"), Tile("B"), Tile("O"), Tile("I"), Tile("G"), Tile("A"), Tile("A")
+    ];
+    ComputerPlayer player = ComputerPlayer(dawg, hand, b);
+    List<Pair<String, int>> wordsAndScores = player.makeMove();
+    print(wordsAndScores);
+    print(b);
+    for (Pair<String, int> pair in wordsAndScores) {
+      print(dawg.contains(pair.a));
+      assert(validWords.contains(pair.a));
+    }
   });
 }
 
