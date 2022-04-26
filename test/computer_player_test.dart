@@ -42,6 +42,7 @@ main() {
       Tile("C"), Tile("B"), Tile("O"), Tile("I"), Tile("G"), Tile("A"), Tile("A")
     ];
     ComputerPlayer player = ComputerPlayer(dawg, hand, b);
+    print(player.getAnchorPositions(Direction.east));
     List<Pair<String, int>> wordsAndScores = player.makeMove();
     print(wordsAndScores);
     print(b);

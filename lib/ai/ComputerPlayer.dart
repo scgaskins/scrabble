@@ -88,7 +88,7 @@ class ComputerPlayer {
   /// built off of the anchor square that can be made with the tiles
   /// on hand
   void _leftPart(String partialWord, Node n, bool terminalNode, int limit, Position anchorSquare, Direction right) {
-    _extendRight(partialWord, n, terminalNode, anchorSquare, right);
+    _extendRight(partialWord, n, terminalNode, anchorSquare, anchorSquare, right);
     if (limit > 0) {
       for (Edge edge in n.edges) {
         Tile? tileForEdge = _drawTileWithLetter(edge.label);
@@ -105,10 +105,10 @@ class ComputerPlayer {
   /// This is called by _leftPart. It recursively builds all possible words
   /// that can be made off of the left part and checks each one to see if it is a
   /// valid move
-  void _extendRight(String partialWord, Node n, bool terminalNode, Position startPos, Direction right) {
+  void _extendRight(String partialWord, Node n, bool terminalNode, Position startPos, Position anchor, Direction right) {
     if (!board.isPositionOccupied(startPos)) {
-      if (terminalNode)
-        checkMove(startPos, right);
+      if (terminalNode && startPos != anchor)
+        checkMove(partialWord, startPos, right);
       for (Edge edge in n.edges) {
         if (_haveTileWithLetter(edge.label) && _crossCheckLetter(edge.label, startPos, right)) {
           Tile tile = _drawTileWithLetter(edge.label)!;
@@ -116,7 +116,7 @@ class ComputerPlayer {
           Node nextNode = edge.nextNode;
           Position nextSquare = startPos.getNeighbor(right);
           if (board.isPositionOnBoard(nextSquare))
-            _extendRight(partialWord + tile.letter, nextNode, edge.isTerminal, nextSquare, right);
+            _extendRight(partialWord + tile.letter, nextNode, edge.isTerminal, nextSquare, anchor, right);
           _returnTileToHand(_tilesBeingConsidered.removeLast());
         }
       }
@@ -127,30 +127,34 @@ class ComputerPlayer {
         Node nextNode = edgeWithLetter.nextNode;
         Position nextPos = startPos.getNeighbor(right);
         if (board.isPositionOnBoard(nextPos))
-          _extendRight(partialWord + letterOnSquare, nextNode, edgeWithLetter.isTerminal, nextPos, right);
+          _extendRight(partialWord + letterOnSquare, nextNode, edgeWithLetter.isTerminal, nextPos, anchor, right);
       }
     }
   }
 
-  void checkMove(Position endPos, Direction right) {
-    Direction left = right == Direction.east ? Direction.west : Direction.north;
-    List<Pair<Position, Tile>> currentMove = [];
-    Position lastPos = endPos;
-    for (Tile tile in _tilesBeingConsidered.reversed) {
-      Position posForTile = lastPos.getNeighbor(left);
-      while (board.isPositionOccupied(posForTile))
-        posForTile = posForTile.getNeighbor(left);
-      currentMove.insert(0, Pair(posForTile, tile));
-      board.addTileToPosition(tile, posForTile);
-      lastPos = posForTile;
-    }
-    List<Pair<String, int>> wordsAndScores = board.getWordsAndScoresOffList(currentMove.map((pair) => pair.a).toList());
-    board.removeAllTilesFromPos(currentMove.map((pair) => pair.a).toList());
-    int totalScore = wordsAndScores.fold(0, (sum, pair) => sum + pair.b);
-    if (totalScore > _bestScore) {
-      _bestMove = currentMove;
-      _bestScore = totalScore;
-      _bestMoveResult = wordsAndScores;
+  void checkMove(String partialWord, Position endPos, Direction right) {
+    if (validWords.contains(partialWord)) {
+      Direction left = right == Direction.east ? Direction.west : Direction
+          .north;
+      List<Pair<Position, Tile>> currentMove = [];
+      Position lastPos = endPos;
+      for (Tile tile in _tilesBeingConsidered.reversed) {
+        Position posForTile = lastPos.getNeighbor(left);
+        while (board.isPositionOccupied(posForTile))
+          posForTile = posForTile.getNeighbor(left);
+        currentMove.insert(0, Pair(posForTile, tile));
+        board.addTileToPosition(tile, posForTile);
+        lastPos = posForTile;
+      }
+      List<Pair<String, int>> wordsAndScores = board.getWordsAndScoresOffList(
+          currentMove.map((pair) => pair.a).toList());
+      board.removeAllTilesFromPos(currentMove.map((pair) => pair.a).toList());
+      int totalScore = wordsAndScores.fold(0, (sum, pair) => sum + pair.b);
+      if (totalScore > _bestScore) {
+        _bestMove = currentMove;
+        _bestScore = totalScore;
+        _bestMoveResult = wordsAndScores;
+      }
     }
   }
 
