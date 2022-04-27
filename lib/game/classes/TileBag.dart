@@ -11,7 +11,9 @@ class TileBag {
   late int tileCount;
   Random _rng = Random();
 
-  TileBag() {
+  TileBag({int? seed}) {
+    if (seed != null)
+      _rng = Random(seed);
     lettersRemaining = Map.from(initialTileDistribution);
     tileCount = _getTotalTileCount(); // Get initial count in case letter dist is different from default 100
   }

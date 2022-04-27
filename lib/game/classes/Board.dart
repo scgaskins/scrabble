@@ -56,7 +56,10 @@ class Board {
       if (!tile.isLocked) {
         board[p.column][p.row] = null;
         tile.resetBlankTile();
-      } else throw Exception("The tile at $p is locked in place");
+      } else {
+        print(this);
+        throw Exception("The tile at $p is locked in place");
+      }
     }
     return tile;
   }
