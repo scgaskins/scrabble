@@ -43,12 +43,67 @@ main() {
       Tile("C"), Tile("B"), Tile("O"), Tile("I"), Tile("G"), Tile("A"), Tile("A")
     ];
     ComputerPlayer player = ComputerPlayer(dawg, hand, b);
+    player.updateCrossChecks([
+      Position(7,7), Position(7, 8),
+      Position(7, 9), Position(7, 10)
+    ]);
     print(player.getAnchorPositions(Direction.east));
     List<Pair<String, int>> wordsAndScores = player.makeMove();
     print(wordsAndScores);
     print(b);
     for (Pair<String, int> pair in wordsAndScores) {
       print(dawg.contains(pair.a));
+      assert(validWords.contains(pair.a));
+    }
+  });
+  test("All blank tiles", () {
+    Board b = generateBoard({
+      Position(7, 7): Tile("s"),
+      Position(7, 8): Tile('h'),
+      Position(7, 9): Tile('o'),
+      Position(7, 10): Tile('p')
+    });
+    print(b);
+    Dawg dawg = Dawg(validWords.toList());
+    List<Tile> hand = [
+      Tile(" "), Tile(" "), Tile(" "), Tile(" "),
+      Tile(" "), Tile(" "), Tile(" ")
+    ];
+    ComputerPlayer player = ComputerPlayer(dawg, hand, b);
+    player.updateCrossChecks([
+      Position(7,7), Position(7, 8),
+      Position(7, 9), Position(7, 10)
+    ]);
+    player.makeMove();
+    print(b);
+    print(player.hand);
+  });
+  test("Random tiles test", () {
+    Board b = generateBoard({
+      Position(7, 7): Tile("s"),
+      Position(7, 8): Tile('h'),
+      Position(7, 9): Tile('o'),
+      Position(7, 10): Tile('p')
+    });
+    print(b);
+    Dawg dawg = Dawg(validWords.toList());
+    print("Dawg constructed");
+    TileBag bag = new TileBag();
+    List<Tile> hand = [Tile(" ")];
+    while (hand.length < 7) {
+      hand.add(bag.drawTile()!);
+    }
+    ComputerPlayer player = ComputerPlayer(dawg, hand, b);
+    player.updateCrossChecks([
+      Position(7,7), Position(7, 8),
+      Position(7, 9), Position(7, 10)
+    ]);
+    print(player.hand);
+    List<Pair<String, int>> wordsAndScores = player.makeMove();
+    print(wordsAndScores);
+    print(player.hand);
+    print(b);
+    for (Pair<String, int> pair in wordsAndScores) {
       assert(validWords.contains(pair.a));
     }
   });

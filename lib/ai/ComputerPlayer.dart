@@ -36,7 +36,10 @@ class ComputerPlayer {
 
   Tile? _drawTileWithLetter(String letter) {
     for (int i=0; i<hand.length; i++) {
-      if (hand[i].letter == letter)
+      if (!hand[i].letterIsLocked) {
+        hand[i].setBlankTile(letter);
+        return hand.removeAt(i);
+      } else if (hand[i].letter == letter)
         return hand.removeAt(i);
       /*else if (!hand[i].letterIsLocked) {
         hand[i].setBlankTile(letter);
@@ -47,7 +50,7 @@ class ComputerPlayer {
 
   bool _haveTileWithLetter(String letter) {
     for (Tile t in hand) {
-      if (t.letter == letter) //|| !t.letterIsLocked)
+      if (t.letter == letter || !t.letterIsLocked)
         return true;
     }
     return false;
@@ -202,7 +205,7 @@ class ComputerPlayer {
       Position posForTile = lastPos.getNeighbor(left);
       while (board.isPositionOccupied(posForTile))
         posForTile = posForTile.getNeighbor(left);
-      currentMove.insert(0, Pair(posForTile, PotentialTile(tile.letter, tile.letterIsLocked)));
+      currentMove.insert(0, Pair(posForTile, PotentialTile(tile.letter, !tile.letterIsLocked)));
       board.addTileToPosition(tile, posForTile);
       lastPos = posForTile;
     }
