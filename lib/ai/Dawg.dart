@@ -3,11 +3,11 @@ import 'package:scrabble/ai/Node.dart';
 
 class Dawg {
   late Node rootNode;
-  late List<Node> _register;
+  late Map<int, Node> _register;
 
   Dawg(List<String> words) {
     rootNode = Node([]);
-    _register = [];
+    _register = {};
     _addWords(words);
   }
 
@@ -93,10 +93,10 @@ class Dawg {
     Node lastChild = state.lastChild;
     if (lastChild.hasChildren())
       _replaceOrRegister(lastChild);
-    if (_register.contains(lastChild)) {
-      state.lastChild = _register[_register.indexOf(lastChild)];
+    if (_register.containsKey(lastChild.hashCode)) {
+      state.lastChild = _register[lastChild.hashCode]!;
     } else {
-      _register.add(lastChild);
+      _register.putIfAbsent(lastChild.hashCode, () => lastChild);
     }
   }
 
