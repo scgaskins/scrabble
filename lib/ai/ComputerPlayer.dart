@@ -8,6 +8,7 @@ import 'package:scrabble/ai/Dawg.dart';
 import 'package:scrabble/ai/Node.dart';
 import 'package:scrabble/ai/Edge.dart';
 import 'package:scrabble/ai/PotentialTile.dart';
+import 'package:scrabble/ai/heuristics/HighestScore.dart';
 
 class ComputerPlayer {
   Dawg _wordGraph;
@@ -22,7 +23,8 @@ class ComputerPlayer {
   List<Tile> _tilesBeingConsidered = [];
   List<Pair<Position, PotentialTile>> _bestMove = [];
   List<Pair<String, int>> _bestMoveResult = [];
-  int _bestScore = 0;
+  int Function(List<Pair<String,int>>, List<Tile>) _evaluationFunction = highestScore;
+  int _bestRating = 0;
 
   ComputerPlayer(this._wordGraph, this.hand, this.board) {
     Set<String> alphabetSet = Set.from(_alphabetList);
@@ -64,7 +66,7 @@ class ComputerPlayer {
   List<Pair<String, int>> makeMove() {
     _bestMove.clear();
     _bestMoveResult.clear();
-    _bestScore = 0;
+    _bestRating = 0;
     print(_tilesBeingConsidered);
     _evaluateAllMoves();
     _endMove();
@@ -187,11 +189,11 @@ class ComputerPlayer {
       List<Position> movePositions = currentMove.map((pair) => pair.a).toList();
       List<Pair<String, int>> wordsAndScores = board.getWordsAndScoresOffList(movePositions);
       board.removeAllTilesFromPos(movePositions);
-      int totalScore = wordsAndScores.fold(0, (sum, pair) => sum + pair.b);
       bool allValid = wordsAndScores.fold(true, (valid, pair) => valid && validWords.contains(pair.a));
-      if (allValid && totalScore > _bestScore) {
+      int heuristicRating = _evaluationFunction(wordsAndScores, hand);
+      if (allValid && heuristicRating > _bestRating) {
         _bestMove = currentMove;
-        _bestScore = totalScore;
+        _bestRating = heuristicRating;
         _bestMoveResult = wordsAndScores;
       }
     }
