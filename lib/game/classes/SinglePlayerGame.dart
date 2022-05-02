@@ -165,11 +165,13 @@ class SinglePlayerGame implements Game {
 
   @override
   void updateScores(List<int> scores) {
-    int totalIncrease = scores.reduce((total, score) => total + score);
-    if (currentTurn == 0)
-      _usersScore += totalIncrease;
-    else
-      _computerScore += totalIncrease;
+    if (scores.isNotEmpty) {
+      int totalIncrease = scores.reduce((total, score) => total + score);
+      if (currentTurn == 0)
+        _usersScore += totalIncrease;
+      else
+        _computerScore += totalIncrease;
+    }
   }
 
   @override

@@ -42,7 +42,7 @@ class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
       body: GameGui(
         game: widget.game,
         uidsToPlayers: widget.uidsToPlayers,
-        pushGameStateToFirebase: updateFirebase,
+        pushGameStateToFirebase: updateGameState,
       ),
     );
   }
@@ -53,7 +53,7 @@ class _SinglePlayerGamePageState extends State<SinglePlayerGamePage> {
     );
   }
 
-  Future<bool> updateFirebase(Game gameState) async {
+  Future<bool> updateGameState(Game gameState) async {
     gameState.endTurn();
     List<Pair<String, int>> wordsAndScores = widget.game.computerPlayer.makeMove();
     gameState.updateScores(wordsAndScores.map((e) => e.b).toList());

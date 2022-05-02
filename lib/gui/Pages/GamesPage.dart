@@ -68,7 +68,7 @@ class _GamesPageState extends State<GamesPage> {
     Dawg dawg = Dawg(validWords.toList());
     SinglePlayerGame game = SinglePlayerGame(widget.uid, "COMPUTER_PLAYER", dawg);
     Map<String, User> uidsToPlayers = {
-      widget.uid: User(widget.userName, ""),
+      //widget.uid: User(widget.userName, ""),
       "COMPUTER_PLAYER": User("computer", "")
     };
     Navigator.pushNamed(context, "/singlePlayerGame",
