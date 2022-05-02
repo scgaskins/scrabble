@@ -1,6 +1,5 @@
 import 'package:scrabble/game/classes/Tile.dart';
 import 'package:scrabble/game/classes/Board.dart';
-import 'package:scrabble/game/game_data/ValidWords.dart';
 import 'package:scrabble/utility/Position.dart';
 import 'package:scrabble/utility/Direction.dart';
 import 'package:scrabble/utility/Pair.dart';
@@ -38,15 +37,11 @@ class ComputerPlayer {
 
   Tile? _drawTileWithLetter(String letter) {
     for (int i=0; i<hand.length; i++) {
-      if (!hand[i].letterIsLocked) {
+      if (!hand[i].letterIsLocked) { // If the tile is blank
         hand[i].setBlankTile(letter);
         return hand.removeAt(i);
       } else if (hand[i].letter == letter)
         return hand.removeAt(i);
-      /*else if (!hand[i].letterIsLocked) {
-        hand[i].setBlankTile(letter);
-        return hand.removeAt(i);
-      }*/
     }
   }
 
@@ -184,12 +179,12 @@ class ComputerPlayer {
   }
 
   void _evaluateMove(String partialWord, Position endPos, Direction right) {
-    if (validWords.contains(partialWord)) {
+    if (_wordGraph.contains(partialWord)) {
       List<Pair<Position, PotentialTile>> currentMove = _placeTilesOnBoard(endPos, right);
       List<Position> movePositions = currentMove.map((pair) => pair.a).toList();
       List<Pair<String, int>> wordsAndScores = board.getWordsAndScoresOffList(movePositions);
       board.removeAllTilesFromPos(movePositions);
-      bool allValid = wordsAndScores.fold(true, (valid, pair) => valid && validWords.contains(pair.a));
+      bool allValid = wordsAndScores.fold(true, (valid, pair) => valid && _wordGraph.contains(pair.a));
       int heuristicRating = _evaluationFunction(wordsAndScores, hand);
       if (allValid && heuristicRating > _bestRating) {
         _bestMove = currentMove;

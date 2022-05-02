@@ -139,6 +139,23 @@ main() {
         assert(validWords.contains(pair.a));
     }
   });
+  test("No tiles", () {
+    Board b = generateBoard({
+      Position(7, 7): Tile("s"),
+      Position(7, 8): Tile('h'),
+      Position(7, 9): Tile('o'),
+      Position(7, 10): Tile('p')
+    });
+    Dawg dawg = Dawg(validWords.toList());
+    List<Tile> hand = [];
+    ComputerPlayer player = ComputerPlayer(dawg, hand, b);
+    player.updateCrossChecks([
+      Position(7,7), Position(7, 8),
+      Position(7, 9), Position(7, 10)
+    ]);
+    List<Pair<String, int>> wordsAndScores = player.makeMove();
+    assert(wordsAndScores.isEmpty);
+  });
 }
 
 Board generateBoard(Map<Position, Tile> tiles) {

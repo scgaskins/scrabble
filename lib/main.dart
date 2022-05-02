@@ -7,6 +7,7 @@ import 'package:scrabble/gui/Pages/RegisterPage.dart';
 import 'package:scrabble/gui/Pages/SignInPage.dart';
 import 'package:scrabble/gui/Pages/GamePage.dart';
 import 'package:scrabble/gui/Pages/CreateGamePage.dart';
+import 'package:scrabble/gui/Pages/SinglePlayerGamePage.dart';
 
 void main() {
   runApp(App());
@@ -101,20 +102,14 @@ class MyApp extends StatelessWidget {
             gameAccess: args.gameAccess,
             uidsToPlayers: args.uidsToPlayers,
           ));
+        } else if (settings.name == "/singlePlayerGame") {
+          final args = settings.arguments as SinglePlayerGamePageArguments;
+          return MaterialPageRoute(builder: (context) => SinglePlayerGamePage(
+              game: args.game,
+              uidsToPlayers: args.uidsToPlayers
+          ));
         }
         },
-      /*routes: {
-        '/': (context) => Consumer<Authentication>(
-          builder: (context, authState, _) => Start(logInState: authState.logInState),
-        ),
-        '/register': (context) => Consumer<Authentication>(
-          builder: (context, authState, _) => RegisterPage(signUp: authState.registerAccount),
-        ),
-        "/signIn": (context) => Consumer<Authentication>(
-          builder: (context, authState, _) => SignInPage(signIn: authState.signIn)
-        ),
-        "/game": (context) => GamePage(),
-      },*/
     );
   }
 }

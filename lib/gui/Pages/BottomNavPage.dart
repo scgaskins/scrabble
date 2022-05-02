@@ -25,6 +25,7 @@ class _BottomNavPageState extends State<BottomNavPage> {
           builder: (context, authState, _) =>
               GamesPage(
                 uid: authState.userId!,
+                userName: authState.displayName!,
                 database: _database,
                 gameListAccess: GameListAccess(_database, authState.userId!),
               )
