@@ -16,7 +16,12 @@ class ComputerPlayerEnhanced extends ComputerPlayer {
   late Map<Position,int> _downAnchorLimits;
   late Map<Position, int> _acrossAnchorLimits;
 
-  ComputerPlayerEnhanced(Dawg wordGraph, List<Tile> hand, Board board) : super(wordGraph, hand, board);
+  ComputerPlayerEnhanced(
+      Dawg wordGraph,
+      List<Tile> hand,
+      Board board,
+      int Function(List<Pair<String,int>>, List<Position>, List<Tile>, Board) evaluationFunction)
+      : super(wordGraph, hand, board, evaluationFunction);
 
   @override
   List<Pair<String, int>> makeMove() {

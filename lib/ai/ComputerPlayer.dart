@@ -22,10 +22,10 @@ class ComputerPlayer {
   List<Tile> tilesBeingConsidered = [];
   List<Pair<Position, PotentialTile>> _bestMove = [];
   List<Pair<String, int>> _bestMoveResult = [];
-  int Function(List<Pair<String,int>>, List<Tile>) _evaluationFunction = highestScore;
-  int _bestRating = 0;
+  int Function(List<Pair<String,int>>, List<Position>, List<Tile>, Board) _evaluationFunction;
+  int _bestRating = -10000;
 
-  ComputerPlayer(this.wordGraph, this.hand, this.board) {
+  ComputerPlayer(this.wordGraph, this.hand, this.board, this._evaluationFunction) {
     Set<String> alphabetSet = Set.from(_alphabetList);
     _downCrosschecks = List.generate(board.boardSize, (index) {
       return List.generate(board.boardSize, (i) => alphabetSet);
@@ -36,6 +36,7 @@ class ComputerPlayer {
   }
 
   List<Pair<String,int>> get bestMoveResult => _bestMoveResult;
+  List<Position> get bestMovePositions => _bestMove.map((e) => e.a).toList();
 
   Set<String> crossCheckSet(Position pos, Direction dir) {
     if (dir == Direction.north || dir == Direction.south)
@@ -69,7 +70,7 @@ class ComputerPlayer {
   void clearData() {
     _bestMove.clear();
     _bestMoveResult.clear();
-    _bestRating = 0;
+    _bestRating = -10000;
   }
 
   List<Pair<String, int>> makeMove() {
@@ -196,7 +197,7 @@ class ComputerPlayer {
       List<Pair<String, int>> wordsAndScores = board.getWordsAndScoresOffList(movePositions);
       board.removeAllTilesFromPos(movePositions);
       bool allValid = wordsAndScores.fold(true, (valid, pair) => valid && wordGraph.contains(pair.a));
-      int heuristicRating = _evaluationFunction(wordsAndScores, hand);
+      int heuristicRating = _evaluationFunction(wordsAndScores, movePositions, hand, board);
       if (allValid && heuristicRating > _bestRating) {
         _bestMove = currentMove;
         _bestRating = heuristicRating;

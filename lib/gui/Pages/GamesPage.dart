@@ -9,6 +9,8 @@ import 'package:scrabble/gui/GameList.dart';
 import 'package:scrabble/gui/Pages/CreateGamePage.dart';
 import 'package:scrabble/gui/Pages/SinglePlayerGamePage.dart';
 import 'package:scrabble/networking/User.dart';
+import 'package:scrabble/ai/heuristics/HighestScore.dart';
+import 'package:scrabble/ai/heuristics/AvoidGivingOpenings.dart';
 
 class GamesPage extends StatefulWidget {
   GamesPage({Key? key, required this.userName, required this.uid, required this.database, required this.gameListAccess}): super(key: key);
@@ -66,7 +68,7 @@ class _GamesPageState extends State<GamesPage> {
 
   void makeSinglePlayerGame() {
     Dawg dawg = Dawg(validWords.toList());
-    SinglePlayerGame game = SinglePlayerGame(widget.uid, "COMPUTER_PLAYER", dawg);
+    SinglePlayerGame game = SinglePlayerGame(widget.uid, "COMPUTER_PLAYER", dawg, highestScore);
     Map<String, User> uidsToPlayers = {
       //widget.uid: User(widget.userName, ""),
       "COMPUTER_PLAYER": User("computer", "")

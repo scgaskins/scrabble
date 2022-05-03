@@ -8,6 +8,7 @@ import 'package:scrabble/utility/Position.dart';
 import 'package:scrabble/utility/Direction.dart';
 import 'package:scrabble/utility/Pair.dart';
 import 'package:scrabble/game/classes/TileBag.dart';
+import 'package:scrabble/ai/heuristics/HighestScore.dart';
 
 main() {
   test("Anchor positions test", () {
@@ -18,7 +19,7 @@ main() {
       Position(7, 10): Tile('p')
     });
     print(b);
-    ComputerPlayer player = ComputerPlayer(Dawg(["ajklaf", "bjlkaj", "cjlaewl"]), [], b);
+    ComputerPlayer player = ComputerPlayer(Dawg(["ajklaf", "bjlkaj", "cjlaewl"]), [], b, highestScore);
     List<Position> downAnchors = player.getAnchorPositions(Direction.south);
     print(downAnchors);
     testLists(downAnchors, [Position(7, 6)]);
@@ -42,7 +43,7 @@ main() {
     List<Tile> hand = [
       Tile("C"), Tile("B"), Tile("O"), Tile("I"), Tile("G"), Tile("A"), Tile("A")
     ];
-    ComputerPlayer player = ComputerPlayer(dawg, hand, b);
+    ComputerPlayer player = ComputerPlayer(dawg, hand, b, highestScore);
     player.updateCrossChecks([
       Position(7,7), Position(7, 8),
       Position(7, 9), Position(7, 10)
@@ -69,7 +70,7 @@ main() {
       Tile(" "), Tile(" "), Tile(" "), Tile(" "),
       Tile(" "), Tile(" "), Tile(" ")
     ];
-    ComputerPlayer player = ComputerPlayer(dawg, hand, b);
+    ComputerPlayer player = ComputerPlayer(dawg, hand, b, highestScore);
     player.updateCrossChecks([
       Position(7,7), Position(7, 8),
       Position(7, 9), Position(7, 10)
@@ -93,7 +94,7 @@ main() {
     while (hand.length < 7) {
       hand.add(bag.drawTile()!);
     }
-    ComputerPlayer player = ComputerPlayer(dawg, hand, b);
+    ComputerPlayer player = ComputerPlayer(dawg, hand, b, highestScore);
     player.updateCrossChecks([
       Position(7,7), Position(7, 8),
       Position(7, 9), Position(7, 10)
@@ -120,7 +121,7 @@ main() {
     for (int i=0;i<80;i++)
       bag.drawTile();
     List<Tile> hand = [];
-    ComputerPlayer player = ComputerPlayer(dawg, hand, b);
+    ComputerPlayer player = ComputerPlayer(dawg, hand, b, highestScore);
     player.updateCrossChecks([
       Position(7,7), Position(7, 8),
       Position(7, 9), Position(7, 10)
@@ -148,7 +149,7 @@ main() {
     });
     Dawg dawg = Dawg(validWords.toList());
     List<Tile> hand = [];
-    ComputerPlayer player = ComputerPlayer(dawg, hand, b);
+    ComputerPlayer player = ComputerPlayer(dawg, hand, b, highestScore);
     player.updateCrossChecks([
       Position(7,7), Position(7, 8),
       Position(7, 9), Position(7, 10)

@@ -33,8 +33,9 @@ class SinglePlayerGame implements Game {
   late ComputerPlayer computerPlayer;
   late TileBag _tileBag;
   Dawg _dawg;
+  int Function(List<Pair<String,int>>, List<Position>, List<Tile>, Board) _evaluationFunction;
 
-  SinglePlayerGame(String userUid, String computerUid, this._dawg) {
+  SinglePlayerGame(String userUid, String computerUid, this._dawg, this._evaluationFunction) {
     playerUids = [userUid, computerUid];
     board = Board();
     _tileBag = TileBag();
@@ -47,7 +48,7 @@ class SinglePlayerGame implements Game {
       computerHand.add(_tileBag.drawTile()!);
     }
     user = Player(playerUids[0], playerHand);
-    computerPlayer = ComputerPlayer(_dawg, computerHand, board);
+    computerPlayer = ComputerPlayer(_dawg, computerHand, board, _evaluationFunction);
   }
 
   @override

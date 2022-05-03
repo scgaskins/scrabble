@@ -8,6 +8,7 @@ import 'package:scrabble/utility/Position.dart';
 import 'package:scrabble/utility/Direction.dart';
 import 'package:scrabble/utility/Pair.dart';
 import 'package:scrabble/game/classes/TileBag.dart';
+import 'package:scrabble/ai/heuristics/HighestScore.dart';
 
 main() {
   test("Anchor positions test", () {
@@ -18,7 +19,7 @@ main() {
       Position(7, 10): Tile('p')
     });
     print(b);
-    ComputerPlayerEnhanced player = ComputerPlayerEnhanced(Dawg(["ajklaf", "bjlkaj", "cjlaewl"]), [], b);
+    ComputerPlayerEnhanced player = ComputerPlayerEnhanced(Dawg(["ajklaf", "bjlkaj", "cjlaewl"]), [], b, highestScore);
     List<Position> downAnchors = player.getAnchorPositions(Direction.south);
     print(downAnchors);
     testLists(downAnchors, [Position(7, 6)]);
@@ -42,7 +43,7 @@ main() {
     List<Tile> hand = [
       Tile("C"), Tile("B"), Tile("O"), Tile("I"), Tile("G"), Tile("A"), Tile("A")
     ];
-    ComputerPlayerEnhanced player = ComputerPlayerEnhanced(dawg, hand, b);
+    ComputerPlayerEnhanced player = ComputerPlayerEnhanced(dawg, hand, b, highestScore);
     player.updateCrossChecks([
       Position(7,7), Position(7, 8),
       Position(7, 9), Position(7, 10)
@@ -69,7 +70,7 @@ main() {
       Tile(" "), Tile(" "), Tile(" "), Tile(" "),
       Tile(" "), Tile(" "), Tile(" ")
     ];
-    ComputerPlayerEnhanced player = ComputerPlayerEnhanced(dawg, hand, b);
+    ComputerPlayerEnhanced player = ComputerPlayerEnhanced(dawg, hand, b, highestScore);
     player.updateCrossChecks([
       Position(7,7), Position(7, 8),
       Position(7, 9), Position(7, 10)
@@ -93,7 +94,7 @@ main() {
     while (hand.length < 7) {
       hand.add(bag.drawTile()!);
     }
-    ComputerPlayerEnhanced player = ComputerPlayerEnhanced(dawg, hand, b);
+    ComputerPlayerEnhanced player = ComputerPlayerEnhanced(dawg, hand, b, highestScore);
     player.updateCrossChecks([
       Position(7,7), Position(7, 8),
       Position(7, 9), Position(7, 10)
@@ -116,7 +117,7 @@ main() {
     });
     Dawg dawg = Dawg(validWords.toList());
     List<Tile> hand = [];
-    ComputerPlayerEnhanced player = ComputerPlayerEnhanced(dawg, hand, b);
+    ComputerPlayerEnhanced player = ComputerPlayerEnhanced(dawg, hand, b, highestScore);
     player.updateCrossChecks([
       Position(7,7), Position(7, 8),
       Position(7, 9), Position(7, 10)
