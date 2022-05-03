@@ -10,7 +10,7 @@ import 'package:scrabble/ai/PotentialTile.dart';
 import 'package:scrabble/ai/heuristics/HighestScore.dart';
 
 class ComputerPlayer {
-  Dawg _wordGraph;
+  Dawg wordGraph;
   late List<List<Set<String>>> _downCrosschecks;
   late List<List<Set<String>>> _acrossCrosschecks;
   List<String> _alphabetList = [
@@ -19,13 +19,13 @@ class ComputerPlayer {
   ];
   Board board;
   List<Tile> hand;
-  List<Tile> _tilesBeingConsidered = [];
+  List<Tile> tilesBeingConsidered = [];
   List<Pair<Position, PotentialTile>> _bestMove = [];
   List<Pair<String, int>> _bestMoveResult = [];
   int Function(List<Pair<String,int>>, List<Tile>) _evaluationFunction = highestScore;
   int _bestRating = 0;
 
-  ComputerPlayer(this._wordGraph, this.hand, this.board) {
+  ComputerPlayer(this.wordGraph, this.hand, this.board) {
     Set<String> alphabetSet = Set.from(_alphabetList);
     _downCrosschecks = List.generate(board.boardSize, (index) {
       return List.generate(board.boardSize, (i) => alphabetSet);
@@ -35,7 +35,15 @@ class ComputerPlayer {
     });
   }
 
-  Tile? _drawTileWithLetter(String letter) {
+  List<Pair<String,int>> get bestMoveResult => _bestMoveResult;
+
+  Set<String> crossCheckSet(Position pos, Direction dir) {
+    if (dir == Direction.north || dir == Direction.south)
+      return _acrossCrosschecks[pos.column][pos.row];
+    return _downCrosschecks[pos.column][pos.row];
+  }
+
+  Tile? drawTileWithLetter(String letter) {
     for (int i=0; i<hand.length; i++) {
       if (!hand[i].letterIsLocked) { // If the tile is blank
         hand[i].setBlankTile(letter);
@@ -45,7 +53,7 @@ class ComputerPlayer {
     }
   }
 
-  bool _haveTileWithLetter(String letter) {
+  bool haveTileWithLetter(String letter) {
     for (Tile t in hand) {
       if (t.letter == letter || !t.letterIsLocked)
         return true;
@@ -53,18 +61,21 @@ class ComputerPlayer {
     return false;
   }
 
-  void _returnTileToHand(Tile tile) {
+  void returnTileToHand(Tile tile) {
     tile.resetBlankTile();
     hand.add(tile);
   }
 
-  List<Pair<String, int>> makeMove() {
+  void clearData() {
     _bestMove.clear();
     _bestMoveResult.clear();
     _bestRating = 0;
-    print(_tilesBeingConsidered);
+  }
+
+  List<Pair<String, int>> makeMove() {
+    clearData();
     _evaluateAllMoves();
-    _endMove();
+    endMove();
     return _bestMoveResult;
   }
 
@@ -77,7 +88,7 @@ class ComputerPlayer {
     _genAndEvaluateAllMovesInDir(acrossAnchors, Direction.east);
   }
 
-  void _endMove() {
+  void endMove() {
     _placeAllPotentialTiles();
     List<Position> movePositions = _bestMove.map((pair) => pair.a).toList();
     board.lockTiles(movePositions);
@@ -103,7 +114,7 @@ class ComputerPlayer {
     }
     print(hand);
     print(_bestMove);
-    print(_tilesBeingConsidered);
+    print(tilesBeingConsidered);
     throw Exception("Could not find tile that matched $potentialTile");
   }
 
@@ -112,13 +123,13 @@ class ComputerPlayer {
   void _genAndEvaluateAllMovesInDir(List<Position> anchors, Direction right) {
     Direction left = right == Direction.east ? Direction.west : Direction.north;
     for (Position anchor in anchors) {
-      int limit = _emptySquaresLeftOfSquare(anchor, left);
-      _leftPart("", _wordGraph.rootNode, false, limit, anchor, right);
+      int limit = emptySquaresLeftOfSquare(anchor, left);
+      _leftPart("", wordGraph.rootNode, false, limit, anchor, right);
     }
   }
 
   /// This counts all the squares left of start that have no occupied neighbors
-  int _emptySquaresLeftOfSquare(Position start, Direction left) {
+  int emptySquaresLeftOfSquare(Position start, Direction left) {
     int c = 0;
     for (Position p=start.getNeighbor(left); board.isPositionOnBoard(p) && !board.isPositionOccupied(p); p=p.getNeighbor(left)) {
       for (Direction dir in Direction.values) {
@@ -134,15 +145,15 @@ class ComputerPlayer {
   /// built off of the anchor square that can be made with the tiles
   /// on hand
   void _leftPart(String partialWord, Node n, bool terminalNode, int limit, Position anchorSquare, Direction right) {
-    _extendRight(partialWord, n, terminalNode, anchorSquare, anchorSquare, right);
+    extendRight(partialWord, n, terminalNode, anchorSquare, anchorSquare, right);
     if (limit > 0) {
       for (Edge edge in n.edges) {
-        Tile? tileForEdge = _drawTileWithLetter(edge.label);
+        Tile? tileForEdge = drawTileWithLetter(edge.label);
         if (tileForEdge != null) {
-          _tilesBeingConsidered.add(tileForEdge);
+          tilesBeingConsidered.add(tileForEdge);
           Node nextNode = edge.nextNode;
           _leftPart(partialWord + tileForEdge.letter, nextNode, edge.isTerminal, limit - 1, anchorSquare, right);
-          _returnTileToHand(_tilesBeingConsidered.removeLast());
+          returnTileToHand(tilesBeingConsidered.removeLast());
         }
       }
     }
@@ -151,19 +162,19 @@ class ComputerPlayer {
   /// This is called by _leftPart. It recursively builds all possible words
   /// that can be made off of the left part and checks each one to see if it is a
   /// valid move
-  void _extendRight(String partialWord, Node n, bool terminalNode, Position startPos, Position anchor, Direction right) {
+  void extendRight(String partialWord, Node n, bool terminalNode, Position startPos, Position anchor, Direction right) {
     if (!board.isPositionOccupied(startPos)) {
       if (terminalNode && startPos != anchor)
         _evaluateMove(partialWord, startPos, right);
       for (Edge edge in n.edges) {
-        if (_haveTileWithLetter(edge.label) && _crossCheckLetter(edge.label, startPos)) {
-          Tile tile = _drawTileWithLetter(edge.label)!;
-          _tilesBeingConsidered.add(tile);
+        if (haveTileWithLetter(edge.label) && _crossCheckLetter(edge.label, startPos, right)) {
+          Tile tile = drawTileWithLetter(edge.label)!;
+          tilesBeingConsidered.add(tile);
           Node nextNode = edge.nextNode;
           Position nextSquare = startPos.getNeighbor(right);
           if (board.isPositionOnBoard(nextSquare))
-            _extendRight(partialWord + tile.letter, nextNode, edge.isTerminal, nextSquare, anchor, right);
-          _returnTileToHand(_tilesBeingConsidered.removeLast());
+            extendRight(partialWord + tile.letter, nextNode, edge.isTerminal, nextSquare, anchor, right);
+          returnTileToHand(tilesBeingConsidered.removeLast());
         }
       }
     } else {
@@ -173,18 +184,18 @@ class ComputerPlayer {
         Node nextNode = edgeWithLetter.nextNode;
         Position nextPos = startPos.getNeighbor(right);
         if (board.isPositionOnBoard(nextPos))
-          _extendRight(partialWord + letterOnSquare, nextNode, edgeWithLetter.isTerminal, nextPos, anchor, right);
+          extendRight(partialWord + letterOnSquare, nextNode, edgeWithLetter.isTerminal, nextPos, anchor, right);
       }
     }
   }
 
   void _evaluateMove(String partialWord, Position endPos, Direction right) {
-    if (_wordGraph.contains(partialWord)) {
+    if (wordGraph.contains(partialWord)) {
       List<Pair<Position, PotentialTile>> currentMove = _placeTilesOnBoard(endPos, right);
       List<Position> movePositions = currentMove.map((pair) => pair.a).toList();
       List<Pair<String, int>> wordsAndScores = board.getWordsAndScoresOffList(movePositions);
       board.removeAllTilesFromPos(movePositions);
-      bool allValid = wordsAndScores.fold(true, (valid, pair) => valid && _wordGraph.contains(pair.a));
+      bool allValid = wordsAndScores.fold(true, (valid, pair) => valid && wordGraph.contains(pair.a));
       int heuristicRating = _evaluationFunction(wordsAndScores, hand);
       if (allValid && heuristicRating > _bestRating) {
         _bestMove = currentMove;
@@ -198,7 +209,7 @@ class ComputerPlayer {
     Direction left = right == Direction.east ? Direction.west : Direction.north;
     List<Pair<Position, PotentialTile>> currentMove = [];
     Position lastPos = endPos;
-    for (Tile tile in _tilesBeingConsidered.reversed) {
+    for (Tile tile in tilesBeingConsidered.reversed) {
       Position posForTile = lastPos.getNeighbor(left);
       while (board.isPositionOccupied(posForTile))
         posForTile = posForTile.getNeighbor(left);
@@ -209,9 +220,10 @@ class ComputerPlayer {
     return currentMove;
   }
 
-  bool _crossCheckLetter(String letter, Position pos) {
-    return _acrossCrosschecks[pos.column][pos.row].contains(letter)
-        && _downCrosschecks[pos.column][pos.row].contains(letter);
+  bool _crossCheckLetter(String letter, Position pos, Direction dir) {
+    if (dir == Direction.north || dir == Direction.south)
+      return _acrossCrosschecks[pos.column][pos.row].contains(letter);
+    return _downCrosschecks[pos.column][pos.row].contains(letter);
   }
 
   void updateCrossChecks(List<Position> newTilePos) {
@@ -246,9 +258,9 @@ class ComputerPlayer {
 
   bool _checkWordInDirection(String partialWord, String newChar, Direction dir) {
     if (dir == Direction.east || dir == Direction.south)
-      return _wordGraph.containsPrefix(newChar + partialWord);
+      return wordGraph.containsPrefix(newChar + partialWord);
     else
-      return _wordGraph.containsPrefix(partialWord + newChar);
+      return wordGraph.containsPrefix(partialWord + newChar);
   }
 
   /// If dir == north or south, will find all the anchors for

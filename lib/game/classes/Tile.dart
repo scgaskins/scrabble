@@ -13,6 +13,13 @@ class Tile {
     _setScore();
   }
 
+  Tile.from(Tile tile) {
+    _letter = tile.letter;
+    _score = tile._score;
+    _letterIsLocked = tile._letterIsLocked;
+    _isLocked = tile._isLocked;
+  }
+
   String get letter => _letter;
 
   int get score => _score;
