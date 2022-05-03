@@ -21,4 +21,6 @@ class LeftPart {
   bool matchesCrossSet(Set<String> crossSet) {
     return crossSet.intersection(nextLetters).isNotEmpty;
   }
+
+  int get length => partialWord.length;
 }

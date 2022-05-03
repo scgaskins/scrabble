@@ -24,8 +24,6 @@ class ComputerPlayerEnhanced extends ComputerPlayer {
     _generateLeftParts();
     _setUpAnchors();
     _evaluateMoves();
-    print("This is the hand");
-    print(hand);
     endMove();
     return bestMoveResult;
   }
@@ -45,37 +43,31 @@ class ComputerPlayerEnhanced extends ComputerPlayer {
     for (int n=0; n<hand.length; n++) {
       List<LeftPart> leftPartsLengthN = _leftParts[n];
       for (LeftPart leftPart in leftPartsLengthN) {
-        for (Position anchor in _downAnchors) {
-          if (n <= _downAnchorLimits[anchor]! && leftPart.matchesCrossSet(crossCheckSet(anchor, Direction.south))) {
-            for (Tile tile in leftPart.tiles) {
-              if (!tile.letterIsLocked) {
-                hand.remove(Tile(" "));
-              } else
-                hand.remove(tile);
-            }
-            tilesBeingConsidered = leftPart.tiles;
-            extendRight(leftPart.partialWord, leftPart.lastNode, false, anchor, anchor, Direction.south);
-            tilesBeingConsidered = [];
-            for (Tile tile in leftPart.tiles)
-              returnTileToHand(tile);
-          }
-        }
-        for (Position anchor in _acrossAnchors) {
-          if (n <= _acrossAnchorLimits[anchor]! && leftPart.matchesCrossSet(crossCheckSet(anchor, Direction.east))) {
-            for (Tile tile in leftPart.tiles) {
-              if (!tile.letterIsLocked) {
-                hand.remove(Tile(" "));
-              } else
-                hand.remove(tile);
-            }
-            tilesBeingConsidered = leftPart.tiles;
-            extendRight(leftPart.partialWord, leftPart.lastNode, false, anchor, anchor, Direction.east);
-            tilesBeingConsidered = [];
-            for (Tile tile in leftPart.tiles)
-              returnTileToHand(tile);
-          }
-        }
+        for (Position anchor in _downAnchors)
+          _evaluateMovesForAnchor(anchor, _downAnchorLimits[anchor]!, leftPart, Direction.south);
+        for (Position anchor in _acrossAnchors)
+          _evaluateMovesForAnchor(anchor, _acrossAnchorLimits[anchor]!, leftPart, Direction.east);
       }
+    }
+  }
+
+  void _evaluateMovesForAnchor(Position anchor, int lengthLimit, LeftPart leftPart, Direction right) {
+    if (leftPart.length <= lengthLimit && leftPart.matchesCrossSet(crossCheckSet(anchor, right))) {
+      _removeAllFromHand(leftPart.tiles);
+      tilesBeingConsidered = leftPart.tiles;
+      extendRight(leftPart.partialWord, leftPart.lastNode, false, anchor, anchor, right);
+      tilesBeingConsidered = [];
+      for (Tile tile in leftPart.tiles)
+        returnTileToHand(tile);
+    }
+  }
+
+  void _removeAllFromHand(Iterable<Tile> tiles) {
+    for (Tile tile in tiles) {
+      if (!tile.letterIsLocked) {
+        hand.remove(Tile(" "));
+      } else
+        hand.remove(tile);
     }
   }
 
