@@ -63,7 +63,7 @@ class ComputerPlayerEnhanced extends ComputerPlayer {
       extendRight(leftPart.partialWord, leftPart.lastNode, false, anchor, anchor, right);
       tilesBeingConsidered = [];
       for (Tile tile in leftPart.tiles)
-        returnTileToHand(tile);
+        returnTileToHand(Tile.from(tile));
     }
   }
 

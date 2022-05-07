@@ -53,7 +53,7 @@ class SinglePlayerGame implements Game {
 
   @override
   void checkIfGameOver() {
-    if (_tileBag.isEmpty() && user.handIsEmpty && computerPlayer.hand.isEmpty)
+    if (_tileBag.isEmpty() && (user.handIsEmpty || computerPlayer.hand.isEmpty))
       gameOver = true;
   }
 

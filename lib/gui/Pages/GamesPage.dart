@@ -68,7 +68,7 @@ class _GamesPageState extends State<GamesPage> {
 
   void makeSinglePlayerGame() {
     Dawg dawg = Dawg(validWords.toList());
-    SinglePlayerGame game = SinglePlayerGame(widget.uid, "COMPUTER_PLAYER", dawg, highestScore);
+    SinglePlayerGame game = SinglePlayerGame(widget.uid, "COMPUTER_PLAYER", dawg, avoidGivingOpenings);
     Map<String, User> uidsToPlayers = {
       //widget.uid: User(widget.userName, ""),
       "COMPUTER_PLAYER": User("computer", "")

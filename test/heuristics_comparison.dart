@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:scrabble/ai/Dawg.dart';
-import 'package:scrabble/ai/ComputerPlayer.dart';
+import 'package:scrabble/ai/ComputerPlayerEnhanced.dart';
 import 'package:scrabble/game/classes/Board.dart';
 import 'package:scrabble/game/classes/Tile.dart';
 import 'package:scrabble/game/game_data/ValidWords.dart';
@@ -43,7 +43,7 @@ int runThroughTenPlays(int Function(List<Pair<String,int>>, List<Position>, List
   List<Tile> hand = [];
   for (int i=0; i<7; i++)
     hand.add(tileBag.drawTile()!);
-  ComputerPlayer player = ComputerPlayer(dawg, hand, b, heuristic);
+  ComputerPlayerEnhanced player = ComputerPlayerEnhanced(dawg, hand, b, heuristic);
   player.updateCrossChecks([
     Position(7,7), Position(7, 8),
     Position(7, 9), Position(7, 10)
@@ -80,13 +80,13 @@ void playAgainstEachOther(
     hand1.add(tileBag.drawTile()!);
     hand2.add(tileBag.drawTile()!);
   }
-  ComputerPlayer player1 = ComputerPlayer(dawg, hand1, b, heuristic1);
+  ComputerPlayerEnhanced player1 = ComputerPlayerEnhanced(dawg, hand1, b, heuristic1);
   int score1 = 0;
   player1.updateCrossChecks([
     Position(7,7), Position(7, 8),
     Position(7, 9), Position(7, 10)
   ]);
-  ComputerPlayer player2 = ComputerPlayer(dawg, hand2, b, heuristic2);
+  ComputerPlayerEnhanced player2 = ComputerPlayerEnhanced(dawg, hand2, b, heuristic2);
   int score2 = 0;
   player2.updateCrossChecks([
     Position(7,7), Position(7, 8),

@@ -46,6 +46,8 @@ class Dawg {
     return false;
   }
 
+  /// Words must be in alphabetical order
+  /// for the algorithm to work properly
   void _addWords(List<String> words) {
     for (String word in words) {
       _addWord(word);
