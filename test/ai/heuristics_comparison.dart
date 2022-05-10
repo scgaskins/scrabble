@@ -9,13 +9,33 @@ import 'package:scrabble/utility/Pair.dart';
 import 'package:scrabble/game/classes/TileBag.dart';
 import 'package:scrabble/ai/heuristics/HighestScore.dart';
 import 'package:scrabble/ai/heuristics/AvoidGivingOpenings.dart';
+import 'package:scrabble/ai/heuristics/VowelConsonantBalance.dart';
 
 
 main() {
   test("HighestScore vs. AvoidGivingOpenings", () {
-    heuristicComparer(highestScore, avoidGivingOpenings, 1000);
-    playAgainstEachOther(highestScore, avoidGivingOpenings, 1000);
+    compareHeuristics(highestScore, avoidGivingOpenings);
   });
+  test("HighestScore vs. VowelConsonantBalance", () {
+    compareHeuristics(highestScore, vowelConsonantBalance);
+  });
+  test("AvoidGivingOpenings vs. VowelConsonantBalance", () {
+    compareHeuristics(avoidGivingOpenings, vowelConsonantBalance);
+  });
+}
+
+void compareHeuristics(
+    int Function(List<Pair<String,int>>, List<Position>, List<Tile>, Board) heuristic1,
+    int Function(List<Pair<String,int>>, List<Position>, List<Tile>, Board) heuristic2,
+    ) {
+  for (int i=0; i<10; i++) {
+    print("Test ${i+1}");
+    print("Single Player");
+    heuristicComparer(heuristic1, heuristic2, 1000 + i);
+    print("Against Each Other");
+    playAgainstEachOther(heuristic1, heuristic2, 1000 + i);
+    print("\n");
+  }
 }
 
 void heuristicComparer(
@@ -23,9 +43,7 @@ void heuristicComparer(
     int Function(List<Pair<String,int>>, List<Position>, List<Tile>, Board) heuristic2,
     int randomSeed
     ) {
-  print("Heuristic 1 moves");
   int score1 = runThroughTenPlays(heuristic1, randomSeed);
-  print("Heuristic 2 moves");
   int score2 = runThroughTenPlays(heuristic2, randomSeed);
   print("Heuristic 1 score: $score1");
   print("Heuristic 2 score: $score2");
@@ -51,7 +69,7 @@ int runThroughTenPlays(int Function(List<Pair<String,int>>, List<Position>, List
   int totalScore = 0;
   for (int i=0; i<10; i++) {
     List<Pair<String,int>> wordsAndScores = player.makeMove();
-    print(b);
+    //print(b);
     totalScore += wordsAndScores.fold(0, (sum, pair) => sum + pair.b);
     int tilesMissing = 7 - player.hand.length;
     for (int j=0; j<tilesMissing; j++) {
@@ -95,12 +113,12 @@ void playAgainstEachOther(
   int turnCount = 0;
   while (!tileBag.isEmpty() && turnCount < 50) {
     List<Pair<String,int>> wordsAndScores1 = player1.makeMove();
-    print(b);
+    //print(b);
     score1 += wordsAndScores1.fold(0, (sum, pair) => sum + pair.b);
     List<Position> positions1 = player1.bestMovePositions;
     player2.updateCrossChecks(positions1);
     List<Pair<String,int>> wordsAndScores2 = player2.makeMove();
-    print(b);
+    //print(b);
     score2 += wordsAndScores2.fold(0, (sum, pair) => sum + pair.b);
     List<Position> positions2 = player2.bestMovePositions;
     player1.updateCrossChecks(positions2);

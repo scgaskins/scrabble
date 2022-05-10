@@ -7,7 +7,6 @@ import 'package:scrabble/ai/Dawg.dart';
 import 'package:scrabble/ai/Node.dart';
 import 'package:scrabble/ai/Edge.dart';
 import 'package:scrabble/ai/PotentialTile.dart';
-import 'package:scrabble/ai/heuristics/HighestScore.dart';
 
 class ComputerPlayer {
   Dawg wordGraph;
